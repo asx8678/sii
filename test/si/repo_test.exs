@@ -3,6 +3,10 @@ defmodule Si.RepoTest do
 
   import ExUnit.CaptureLog
 
+  alias Ecto.Adapters.SQL
+  alias Ecto.Adapters.SQL.Sandbox
+  alias Ecto.Adapters.SQLite3
+
   @moduletag :tmp_dir
 
   setup %{tmp_dir: dir} do
@@ -13,7 +17,7 @@ defmodule Si.RepoTest do
   end
 
   test "storage creation uses the configured persistent WAL mode", %{config: config, database: db} do
-    assert Ecto.Adapters.SQLite3.storage_up(config) == :ok
+    assert SQLite3.storage_up(config) == :ok
     assert query(db, "PRAGMA journal_mode") == [["wal"]]
   end
 
@@ -69,8 +73,8 @@ defmodule Si.RepoTest do
         tasks =
           for _ <- 1..config[:pool_size] do
             Task.Supervisor.async(supervisor, fn ->
-              :ok = Ecto.Adapters.SQL.Sandbox.checkout(repo, sandbox: false)
-              assert Ecto.Adapters.SQL.query!(repo, "SELECT 1", []).rows == [[1]]
+              :ok = Sandbox.checkout(repo, sandbox: false)
+              assert SQL.query!(repo, "SELECT 1", []).rows == [[1]]
               send(parent, {:connection_ready, self()})
 
               receive do
@@ -79,7 +83,7 @@ defmodule Si.RepoTest do
                 5_000 -> raise "connection barrier timed out"
               end
 
-              Ecto.Adapters.SQL.Sandbox.checkin(repo)
+              Sandbox.checkin(repo)
             end)
           end
 

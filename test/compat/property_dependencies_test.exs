@@ -145,6 +145,8 @@ defmodule BootstrapCompatibility.PropertyDependenciesTest do
 
   test "actual parallel worker code preserves every catch class and parent message shape" do
     mod = compile_worker!()
+    spawn_jobs = Function.capture(mod, :spawn_jobs, 2)
+    pmap = Function.capture(mod, :pmap, 2)
 
     for {fun, expected} <- [
           {fn _ -> :value end, {:ok, :value}},
@@ -152,17 +154,17 @@ defmodule BootstrapCompatibility.PropertyDependenciesTest do
           {fn _ -> throw({:ok, :thrown_value}) end, {:ok, :thrown_value}},
           {fn _ -> exit(:stopped) end, {:EXIT, :stopped}}
         ] do
-      [pid] = apply(mod, :spawn_jobs, [fun, [:arg]])
+      [pid] = spawn_jobs.(fun, [:arg])
       assert_receive {^pid, ^expected}
     end
 
-    [pid] = apply(mod, :spawn_jobs, [fn _ -> :erlang.error(:badarg) end, [:arg]])
+    [pid] = spawn_jobs.(fn _ -> :erlang.error(:badarg) end, [:arg])
     assert_receive {^pid, {:EXIT, {:badarg, stack}}}
     assert [{__MODULE__, _, 1, _} | _] = stack
     assert Enum.any?(stack, fn {module, _, _, _} -> module == mod end)
-    assert apply(mod, :pmap, [fn x -> x * 2 end, [1, 2, 3]]) == [2, 4, 6]
+    assert pmap.(fn x -> x * 2 end, [1, 2, 3]) == [2, 4, 6]
 
-    assert catch_error(apply(mod, :pmap, [fn _ -> exit(:stopped) end, [:arg]])) ==
+    assert catch_error(pmap.(fn _ -> exit(:stopped) end, [:arg])) ==
              {:EXIT, :stopped}
   end
 

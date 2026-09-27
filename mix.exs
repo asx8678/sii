@@ -10,6 +10,11 @@ defmodule Si.MixProject do
       version: "0.1.0",
       elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
+      # These are compiler input data exercised by si_doc_check_test, not test modules.
+      test_ignore_filters: [
+        "test/fixtures/doc_check/documented.ex",
+        "test/fixtures/doc_check/undocumented.ex"
+      ],
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),

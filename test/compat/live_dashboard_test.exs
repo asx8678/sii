@@ -2,6 +2,7 @@ defmodule BootstrapCompatibility.LiveDashboardTest do
   use ExUnit.Case, async: true
 
   alias BootstrapCompatibility.LiveDashboard
+  alias Phoenix.LiveDashboard.Helpers
 
   @moduletag :tmp_dir
   @fixture Path.expand("../fixtures/live_dashboard/ecto_stats_page.ex.fixture", __DIR__)
@@ -56,7 +57,7 @@ defmodule BootstrapCompatibility.LiveDashboardTest do
 
     assert formatter.(nil, Decimal.new("12.30")) == "12.30"
     assert formatter.(nil, Duration.new!(hour: 2)) == "2h"
-    assert formatter.(:bytes, 1024) == Phoenix.LiveDashboard.Helpers.format_bytes(1024)
+    assert formatter.(:bytes, 1024) == Helpers.format_bytes(1024)
     assert formatter.(:percent, 0.12345) == "12.3"
     assert formatter.(nil, %{unchanged: true}) == %{unchanged: true}
   end

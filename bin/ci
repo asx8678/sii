@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Mix uses exit 2 for failed tests; the CI gate consistently reports failure as 1.
+trap 'exit 1' ERR
+cd "$(dirname "$0")/.."
+FULL=0
+[[ "${1:-}" == "--full" ]] && FULL=1
+step() { printf '\n==> %s\n' "$1"; }
+step "format"; mix format --check-formatted
+step "compile"; mix compile --warnings-as-errors
+step "credo"; mix credo --strict
+step "test"
+if [[ $FULL == 1 ]]; then
+  mix test --warnings-as-errors --include slow --include pi
+else
+  mix test --warnings-as-errors
+fi
+for pkg in bridge testing/pi-faux adapter; do
+  if [[ -f "$pkg/package.json" ]]; then
+    step "$pkg"
+    (cd "$pkg" && npm ci --silent && npm run --silent lint && npm run --silent typecheck --if-present && npm run --silent test --if-present)
+  fi
+done
+if [[ $FULL == 1 && -x bin/contract-test ]]; then step "contract"; bin/contract-test; fi
+printf '\nPASS\n'
