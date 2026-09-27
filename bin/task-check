@@ -1,0 +1,259 @@
+#!/usr/bin/env bash
+# Gates accumulate failures; commands expected to fail are always tested explicitly.
+set -eo pipefail
+cd "$(dirname "$0")/.."
+usage() { printf 'usage: bin/task-check [--final] [ID]\n'; exit 2; }
+final=no
+id=
+for arg in "$@"; do
+  case "$arg" in
+    --final) [[ $final == no ]] || usage; final=yes ;;
+    T[0-9][0-9].[0-9][0-9]) [[ -z $id ]] || usage; id=$arg ;;
+    *) usage ;;
+  esac
+done
+branch=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)
+if [[ -z $id ]]; then
+  case "$branch" in task/T[0-9][0-9].[0-9][0-9]-*) id=${branch#task/}; id=${id%%-*} ;; *) usage ;; esac
+fi
+head=$(git rev-parse HEAD) || exit 1
+logdir=tmp/task-check
+mkdir -p "$logdir"
+report=$logdir/$id.txt
+work=$(mktemp -d "$logdir/.$id.XXXXXX")
+trap 'rm -rf "$work"' EXIT
+printf 'task-check %s HEAD %s final=%s\n' "$id" "$head" "$final" | tee "$report"
+failed=()
+emit() {
+  local gate=$1 status=$2 detail=$3
+  printf '%s %s %s\n' "$gate" "$status" "$detail" | tee -a "$report"
+  if [[ $status == FAIL ]]; then failed+=("$gate"); fi
+}
+join_lines() { awk 'NF {printf "%s%s", sep, $0; sep="; "} END {print ""}' "$1"; }
+mentions() {
+  awk -v needle="$1" '
+    { rest=$0
+      while ((at=index(rest,needle))>0) {
+        before=at==1 ? "" : substr(rest,at-1,1)
+        after=substr(rest,at+length(needle),1)
+        if (before !~ /[A-Za-z0-9_.\/-]/ && after !~ /[A-Za-z0-9_.\/-]/) found=1
+        rest=substr(rest,at+length(needle))
+      }
+    } END {exit !found}' "$task"
+}
+# No source evaluation: inspect only parsed module declarations and module tags.
+source_info() {
+  elixir -e '
+    [mode, file] = System.argv()
+    ast = file |> File.read!() |> Code.string_to_quoted!()
+    {_ast, found} = Macro.prewalk(ast, [], fn
+      {:defmodule, _, [{:__aliases__, _, parts}, _]} = node, acc when mode == "modules" ->
+        {node, [Enum.map_join(parts, ".", &to_string/1) | acc]}
+      {:@, _, [{:moduletag, _, [tag]}]} = node, acc when mode == "tags" ->
+        {node, [tag | acc]}
+      node, acc -> {node, acc}
+    end)
+    if mode == "modules" do
+      Enum.each(Enum.reverse(found), &IO.puts/1)
+    else
+      single? = Enum.any?(found, fn
+        tag when tag in [:contract, :chaos] -> true
+        tags when is_list(tags) -> Keyword.get(tags, :contract, false) || Keyword.get(tags, :chaos, false)
+        _ -> false
+      end)
+      IO.puts(if single?, do: "once", else: "repeat")
+    end
+  ' "$1" "$2"
+}
+shopt -s nullglob
+tasks=(final_plan/tasks/*/"$id"-*.md)
+task=${tasks[0]:-}
+if [[ ${#tasks[@]} == 1 ]]; then emit task PASS "$task"; else emit task FAIL "expected one task file for $id"; task=/dev/null; fi
+if [[ $branch == task/"$id"-* ]] && git merge-base --is-ancestor main HEAD 2>/dev/null; then
+  emit branch PASS "$branch; main is an ancestor"
+else
+  emit branch FAIL "expected task/$id-* based on current main (found ${branch:-detached})"
+fi
+if git status --porcelain > "$work/status" && [[ ! -s $work/status ]]; then
+  emit clean PASS 'working tree is clean'
+else
+  emit clean FAIL "$(join_lines "$work/status")"
+fi
+changed=()
+diff_ok=yes
+if git -c core.quotePath=false diff --name-only -z main...HEAD > "$work/changed" 2> "$work/git-error"; then
+  while IFS= read -r -d '' file; do changed+=("$file"); done < "$work/changed"
+else
+  diff_ok=no
+fi
+scope=()
+for file in "${changed[@]}"; do
+  case "$file" in
+    final_plan/tasks.yaml|final_plan/status/"$id".md|final_plan/0*.md|final_plan/1*.md|mix.lock|package-lock.json|*/package-lock.json) continue ;;
+  esac
+  allowed=no
+  if mentions "$file"; then allowed=yes; fi
+  parent=$file
+  while [[ $allowed == no && $parent == */* ]]; do
+    parent=${parent%/*}
+    if mentions "$parent/"; then allowed=yes; fi
+  done
+  if [[ $allowed == no && ( $file == *.ex || $file == *.exs ) && -f $file ]]; then
+    if source_info modules "$file" > "$work/modules" 2> "$work/modules-error"; then
+      while IFS= read -r module; do if mentions "$module"; then allowed=yes; break; fi; done < "$work/modules"
+    fi
+  fi
+  if [[ $allowed == no ]]; then scope+=("$file"); fi
+done
+if [[ $diff_ok == no ]]; then emit scope WARN 'cannot compare main...HEAD'
+elif [[ ${#scope[@]} -gt 0 ]]; then emit scope WARN "${scope[*]}"
+else emit scope PASS 'all changed paths are declared'; fi
+
+if [[ $diff_ok == yes ]] && git -c core.quotePath=false diff --no-ext-diff --no-color -U0 main...HEAD > "$work/diff"; then
+  awk '
+    function skipped(p) {
+      return p ~ /^(final_plan\/|docs\/|test\/fixtures\/|evals\/|lib\/si\/checks\/test_integrity\/)/ ||
+        p=="AGENTS.md" || p==".credo.exs" || p=="mix.lock" || p ~ /(^|\/)package-lock[.]json$/ ||
+        p=="test/si/checks/test_integrity_test.exs" || p=="bin/task-check"
+    }
+    function issue(level, reason) { print level " " file ":" line ": " reason }
+    BEGIN {
+      n=split("IO.inspect(|dbg(|IEx.pry|require IEx|TODO|FIXME|XXX|@tag :skip|@tag skip:|@moduletag :skip|.skip(|.only(|credo:disable|@dialyzer {:nowarn|@ts-ignore|@ts-nocheck|eslint-disable|biome-ignore|pkill|killall", tokens, "|")
+    }
+    /^diff --git / {in_hunk=0; next}
+    !in_hunk && /^\+\+\+ b\// {file=substr($0,7); next}
+    /^@@ / {in_hunk=1; split($3, range, ","); line=substr(range[1],2)+0; next}
+    in_hunk && /^\+/ {
+      text=substr($0,2)
+      if (!skipped(file)) {
+        for (i=1;i<=n;i++) if (index(text,tokens[i])) issue("FAIL", "forbidden " tokens[i])
+        if (file ~ /^lib\// && file !~ /^lib\/mix\// && index(text,"Mix.env")) issue("FAIL", "environment-dependent library code")
+        if (file ~ /^(lib\/|priv\/|bin\/|cli\/lib\/|bridge\/src\/|adapter\/src\/|testing\/)/ && index(text,"/Users/")) issue("FAIL", "absolute user path")
+        if (text ~ /(^|[^A-Za-z0-9_])(sk-|xai-)[A-Za-z0-9]{20,}/ || text ~ /(^|[^A-Za-z0-9_])ghp_[A-Za-z0-9]{30,}/ || text ~ /-----BEGIN.*PRIVATE KEY-----/) issue("FAIL", "possible secret (value redacted)")
+        if (file ~ /^test\// && (index(text,"Process.sleep(") || index(text,":timer.sleep("))) issue("WARN", "sleep in test")
+        if (file ~ /^lib\// && index(text,"String.to_atom(")) issue("WARN", "dynamic atom")
+        if (file ~ /^(bridge\/src\/|adapter\/src\/)/ && index(text,"console.log(")) issue("WARN", "console logging")
+      }
+      line++
+    }
+  ' "$work/diff" > "$work/hygiene"
+  if grep -q '^FAIL ' "$work/hygiene"; then emit hygiene FAIL "$(join_lines "$work/hygiene")"
+  elif [[ -s $work/hygiene ]]; then emit hygiene WARN "$(join_lines "$work/hygiene")"
+  else emit hygiene PASS 'no prohibited added lines'; fi
+else
+  emit hygiene FAIL 'cannot inspect main...HEAD'
+fi
+ci_log=$logdir/$id-ci.log
+if bin/ci > "$ci_log" 2>&1; then
+  ci_ok=yes
+  emit ci PASS "$ci_log"
+else
+  code=$?
+  ci_ok=no
+  step=$(awk '/^==> / {step=$0} END {print step}' "$ci_log")
+  tail -n 30 "$ci_log" > "$work/ci-tail"
+  emit ci FAIL "exit=$code ${step:-no step reported}; $(join_lines "$work/ci-tail"); log=$ci_log"
+fi
+docs=()
+for file in "${changed[@]}"; do
+  if [[ $file == lib/si/*.ex && -f $file ]]; then docs+=("$file"); fi
+done
+if [[ $ci_ok == no ]]; then
+  emit docs SKIP 'ci failed'
+elif [[ ${#docs[@]} == 0 ]]; then
+  emit docs PASS 'no changed lib/si/*.ex files'
+elif mix si.doc_check "${docs[@]}" > "$work/docs" 2>&1; then
+  emit docs PASS "$(join_lines "$work/docs")"
+else
+  emit docs FAIL "$(join_lines "$work/docs")"
+fi
+# Snapshot immediately before the tests gate, even when tests must be skipped.
+snapshot_ok=yes
+git for-each-ref refs/heads refs/si > "$work/refs-before" || snapshot_ok=no
+git worktree list --porcelain > "$work/worktrees-before" || snapshot_ok=no
+if [[ $ci_ok == no ]]; then
+  emit tests SKIP 'ci failed'
+elif [[ ! -f $task ]]; then
+  emit tests FAIL 'task declaration unavailable'
+else
+  awk '
+    /^[[:space:]]*(```|~~~)/ {fence=!fence; next}
+    !fence && /^#+[[:space:]]/ {
+      match($0,/^#+/); level=RLENGTH
+      title=substr($0,level+1); gsub(/^[[:space:]]+|[[:space:]#]+$/,"",title)
+      if (active && level<=section) active=0
+      if (title=="Deliverables" || title=="Tests" || title=="Verify") {active=1; section=level}
+    }
+    active {
+      rest=$0
+      while (match(rest,/(test\/[A-Za-z0-9_.\/-]*_test\.exs|(bridge|adapter)\/test\/[A-Za-z0-9_.\/-]+|testing\/[A-Za-z0-9_.\/-]+\/test\/[A-Za-z0-9_.\/-]+)/)) {
+        path=substr(rest,RSTART,RLENGTH); before=RSTART==1 ? "" : substr(rest,RSTART-1,1)
+        sub(/[.]+$/,"",path)
+        if (before !~ /[A-Za-z0-9_.\/-]/ && path !~ /\.\.\./ && path !~ /\/$/ && !seen[path]++) print path
+        rest=substr(rest,RSTART+RLENGTH)
+      }
+    }
+  ' "$task" > "$work/required"
+  repeat=()
+  once=()
+  problems=()
+  count=0
+  while IFS= read -r file; do
+    count=$((count+1))
+    if [[ ! -f $file ]]; then problems+=("$file: missing declared test"); continue; fi
+    if [[ $file == test/*_test.exs ]]; then
+      if kind=$(source_info tags "$file" 2> "$work/tag-error"); then
+        if [[ $kind == once ]]; then once+=("$file"); else repeat+=("$file"); fi
+      else problems+=("$file: cannot parse module tags"); fi
+    fi
+  done < "$work/required"
+  if [[ ${#repeat[@]} -gt 0 ]]; then
+    if ! mix test "${repeat[@]}" --include slow --include pi --warnings-as-errors --repeat-until-failure 3 > "$logdir/$id-tests.log" 2>&1; then
+      problems+=("repeated tests failed; log=$logdir/$id-tests.log")
+    fi
+  fi
+  if [[ ${#once[@]} -gt 0 ]]; then
+    if ! mix test "${once[@]}" --include slow --include pi --warnings-as-errors > "$logdir/$id-tests-once.log" 2>&1; then
+      problems+=("contract/chaos tests failed; log=$logdir/$id-tests-once.log")
+    fi
+  fi
+  if [[ ${#problems[@]} -gt 0 ]]; then emit tests FAIL "${problems[*]}"
+  else emit tests PASS "$count declared paths; ${#repeat[@]} repeated, ${#once[@]} once"; fi
+fi
+leftovers=()
+if pgrep -fl 'si_test_home_|si_test_repos|fake_pi[.]mjs' > "$work/processes" 2> "$work/pgrep-error"; then
+  leftovers+=("processes: $(join_lines "$work/processes")")
+else
+  code=$?
+  if [[ $code != 1 ]]; then leftovers+=("process inspection failed ($code)"); fi
+fi
+if ! git for-each-ref refs/heads refs/si > "$work/refs-after" || ! git worktree list --porcelain > "$work/worktrees-after"; then snapshot_ok=no; fi
+if [[ $snapshot_ok == no ]]; then leftovers+=('cannot snapshot repository refs/worktrees')
+else
+  if ! cmp -s "$work/refs-before" "$work/refs-after"; then leftovers+=('repository refs changed during tests'); fi
+  if ! cmp -s "$work/worktrees-before" "$work/worktrees-after"; then leftovers+=('repository worktrees changed during tests'); fi
+fi
+if [[ ${#leftovers[@]} -gt 0 ]]; then emit leftovers FAIL "${leftovers[*]}"
+else emit leftovers PASS 'no processes or repository changes'; fi
+if [[ $final == yes ]]; then
+  problems=()
+  note=final_plan/status/$id.md
+  if git show "HEAD:$note" > "$work/note" 2>/dev/null; then
+    if ! awk -v prefix="# $id " 'index($0,prefix)==1 {found=1} END {exit !found}' "$work/note"; then
+      problems+=("$note: missing task title")
+    fi
+    for field in 'Branch' 'Summary' 'Files' 'Tests added' 'Acceptance criteria' 'Verify' 'After implementing' 'Deliberate break' 'task-check' 'bin/ci' 'Redo history' 'Deviations' 'Follow-ups'; do
+      if ! grep -Eq -- "^[[:space:]]*-[[:space:]]+$field:" "$work/note"; then problems+=("$note: missing $field"); fi
+    done
+  else problems+=("$note: missing from HEAD"); fi
+  if git show HEAD:final_plan/tasks.yaml > "$work/tasks" 2>/dev/null && awk -v id="$id" '
+    /^[[:space:]]*-[[:space:]]+id:/ {selected=($3==id)}
+    selected && /^[[:space:]]*status:/ {if ($2=="done") done=1}
+    END {exit !done}' "$work/tasks"; then :
+  else problems+=("final_plan/tasks.yaml: $id is not done in HEAD"); fi
+  if [[ ${#problems[@]} -gt 0 ]]; then emit final FAIL "${problems[*]}"
+  else emit final PASS 'committed completion note and done status'; fi
+fi
+if [[ ${#failed[@]} == 0 ]]; then printf 'RESULT: PASS\n' | tee -a "$report"; exit 0; fi
+printf 'RESULT: FAIL (%s)\n' "${failed[*]}" | tee -a "$report"
+exit 1

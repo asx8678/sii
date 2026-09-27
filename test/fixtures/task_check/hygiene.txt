@@ -1,0 +1,29 @@
+FAIL|notes.txt|IO.inspect(value)
+FAIL|notes.txt|dbg(value)
+FAIL|notes.txt|IEx.pry()
+FAIL|notes.txt|require IEx
+FAIL|notes.txt|TODO
+FAIL|notes.txt|FIXME
+FAIL|notes.txt|XXX
+FAIL|notes.txt|@tag :skip
+FAIL|notes.txt|@tag skip: true
+FAIL|notes.txt|@moduletag :skip
+FAIL|notes.txt|suite.skip()
+FAIL|notes.txt|suite.only()
+FAIL|notes.txt|credo:disable
+FAIL|notes.txt|@dialyzer {:nowarn, []}
+FAIL|notes.txt|@ts-ignore
+FAIL|notes.txt|@ts-nocheck
+FAIL|notes.txt|eslint-disable
+FAIL|notes.txt|biome-ignore
+FAIL|notes.txt|pkill
+FAIL|notes.txt|killall
+FAIL|lib/check.ex|Mix.env()
+FAIL|priv/check.txt|/Users/example
+WARN|test/example.txt|Process.sleep(1)
+WARN|test/example.txt|:timer.sleep(1)
+WARN|lib/check.ex|String.to_atom(value)
+WARN|bridge/src/check.js|console.log(value)
+WARN|adapter/src/check.js|console.log(value)
+PASS|lib/mix/check.ex|Mix.env()
+PASS|notes.txt|Process.sleep(1)
