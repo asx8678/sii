@@ -1,4 +1,5 @@
 Code.require_file("compat/live_dashboard.exs", __DIR__)
+Code.require_file("compat/otp29.exs", __DIR__)
 
 defmodule Si.MixProject do
   use Mix.Project
@@ -72,7 +73,18 @@ defmodule Si.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "== 0.3.0"},
-      {:bandit, "~> 1.5"}
+      {:bandit, "~> 1.5"},
+      {:yaml_elixir, "~> 2.12"},
+      {:jsv, "~> 0.25.0"},
+      {:muontrap, "~> 2.0"},
+      {:req, "~> 0.7.4"},
+      {:opentelemetry_api, "~> 1.5"},
+      {:opentelemetry, "~> 1.7"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: :dev, runtime: false},
+      {:propcheck, "~> 1.5", only: :test},
+      {:stream_data, "~> 1.4", only: :test},
+      {:mox, "~> 1.3", only: :test}
     ]
   end
 
@@ -85,8 +97,8 @@ defmodule Si.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
-      "deps.get": ["deps.get", &patch_live_dashboard/1],
-      "deps.update": ["deps.update", &patch_live_dashboard/1],
+      "deps.get": ["deps.get", &patch_otp29/1, &patch_live_dashboard/1],
+      "deps.update": ["deps.update", &patch_otp29/1, &patch_live_dashboard/1],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
@@ -102,6 +114,26 @@ defmodule Si.MixProject do
       ],
       precommit: ["compile --warnings-as-errors", "deps.unlock --unused", "format", "test"]
     ]
+  end
+
+  defp patch_otp29(_args) do
+    deps = Mix.Project.deps_path()
+
+    for app <- [:yamerl, :proper, :propcheck],
+        app == :yamerl or File.exists?(Path.join(deps, Atom.to_string(app))) do
+      case BootstrapCompatibility.OTP29.apply_package!(deps, app) do
+        :patched ->
+          builds = Path.join(Path.dirname(Mix.Project.build_path()), "*/lib/#{app}")
+
+          if Path.wildcard(builds) != [] do
+            Mix.Task.reenable("deps.clean")
+            Mix.Task.run("deps.clean", [Atom.to_string(app), "--build"])
+          end
+
+        :unchanged ->
+          :ok
+      end
+    end
   end
 
   defp patch_live_dashboard(_args) do

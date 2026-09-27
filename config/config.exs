@@ -52,6 +52,9 @@ config :tailwind,
     env: %{"NODE_PATH" => [Path.expand("../deps", __DIR__), Mix.Project.build_path()]}
   ]
 
+# No exporter dependency or external collector is part of the foundation.
+config :opentelemetry, traces_exporter: :none
+
 # Configure Elixir's Logger
 config :logger, :default_formatter,
   format: "$time $metadata[$level] $message\n",
