@@ -18,9 +18,15 @@ defmodule Mix.Tasks.Si.DocCheck do
     results =
       files
       |> Enum.flat_map(fn file ->
-        file |> File.read!() |> Code.string_to_quoted!() |> modules(nil)
+        file
+        |> File.read!()
+        |> Code.string_to_quoted!()
+        |> modules()
+        |> Enum.map(fn {module, implementations} ->
+          {module, implementations, Path.expand(file)}
+        end)
       end)
-      |> Enum.uniq_by(&elem(&1, 0))
+      |> Enum.uniq_by(&{elem(&1, 0), elem(&1, 2)})
       |> Enum.map(&check_module/1)
 
     {module_count, function_count, problems} =
@@ -37,26 +43,100 @@ defmodule Mix.Tasks.Si.DocCheck do
     end
   end
 
-  defp modules({:defmodule, _, [{:__aliases__, _, parts}, [do: body]]}, parent) do
-    module = module_name(parts, parent)
-    [{module, implementations(body)} | modules(body, module)]
+  defp modules(ast) do
+    # Alias-only compiler APIs never expand or execute arbitrary user macros.
+    env = %{__ENV__ | module: nil, function: nil, aliases: [], lexical_tracker: nil, tracers: []}
+    {found, _env} = walk(ast, env)
+    found
   end
 
-  defp modules({:defmodule, _, [module, [do: body]]}, _parent) when is_atom(module) do
-    [{module, implementations(body)} | modules(body, module)]
+  defp walk({:__block__, _, expressions}, env) do
+    Enum.reduce(expressions, {[], env}, fn expression, {found, scope} ->
+      {modules, scope} = walk(expression, scope)
+      {found ++ modules, scope}
+    end)
   end
 
-  defp modules({:defmodule, _, _}, _parent),
-    do: Mix.raise("cannot resolve dynamic defmodule name")
+  defp walk({:alias, meta, [target | rest]}, env) do
+    opts = alias_options(List.first(rest) || [])
+    scope = Enum.reduce(alias_targets(target, env), env, &define_alias(&2, meta, &1, opts))
+    {[], scope}
+  end
 
-  defp modules({_form, _meta, args}, parent) when is_list(args), do: modules(args, parent)
-  defp modules({key, value}, parent) when is_atom(key), do: modules(value, parent)
-  defp modules(list, parent) when is_list(list), do: Enum.flat_map(list, &modules(&1, parent))
-  defp modules(_ast, _parent), do: []
+  defp walk({:defmodule, _, [name, [do: body]]}, env) do
+    {module, scope} = module_definition(name, env)
+    {children, _child_scope} = walk(body, %{scope | module: module})
+    {[{module, implementations(body)} | children], scope}
+  end
 
-  defp module_name([:"Elixir" | parts], _parent), do: Module.concat(parts)
-  defp module_name(parts, nil), do: Module.concat(parts)
-  defp module_name(parts, parent), do: Module.concat([parent | parts])
+  defp walk({_form, _meta, args}, env) when is_list(args), do: walk_scopes(args, env)
+  defp walk({_key, value}, env), do: walk(value, env)
+  defp walk(list, env) when is_list(list), do: walk_scopes(list, env)
+  defp walk(_ast, env), do: {[], env}
+
+  defp walk_scopes(expressions, env) do
+    # Aliases in sibling keyword blocks or function bodies cannot escape their scope.
+    {Enum.flat_map(expressions, fn expression -> elem(walk(expression, env), 0) end), env}
+  end
+
+  defp module_definition({:__aliases__, _, [:"Elixir" | _]} = name, env),
+    do: {resolve_module(name, env), env}
+
+  defp module_definition({:__aliases__, meta, [head | tail]}, %{module: parent} = env)
+       when is_atom(head) and not is_nil(parent) do
+    # Kernel.defmodule nests literal alias segments and introduces the first
+    # segment as an alias in the enclosing module (not at file scope).
+    prefix = Module.concat(parent, head)
+    scope = define_alias(env, meta, prefix, as: Module.concat([head]))
+    {Module.concat([prefix | tail]), scope}
+  end
+
+  defp module_definition(name, env), do: {resolve_module(name, env), env}
+
+  defp resolve_module({:__aliases__, meta, parts}, env) do
+    case parts do
+      [{:__MODULE__, _, _} | rest] when not is_nil(env.module) ->
+        Module.concat([env.module | rest])
+
+      _ ->
+        resolve_alias(parts, meta, env)
+    end
+  end
+
+  defp resolve_module({:__MODULE__, _, _}, %{module: module}) when not is_nil(module), do: module
+  defp resolve_module(module, _env) when is_atom(module), do: module
+  defp resolve_module(_expression, _env), do: Mix.raise("cannot resolve dynamic module name")
+
+  defp resolve_alias(parts, meta, env) do
+    if not Enum.all?(parts, &is_atom/1), do: Mix.raise("cannot resolve dynamic module alias")
+
+    case Macro.Env.expand_alias(env, meta, parts) do
+      {:alias, module} -> module
+      :error -> Module.concat(parts)
+    end
+  end
+
+  defp alias_targets({{:., _, [prefix, :{}]}, _, suffixes}, env) do
+    prefix = resolve_module(prefix, env)
+    Enum.map(suffixes, fn {:__aliases__, _, parts} -> Module.concat([prefix | parts]) end)
+  end
+
+  defp alias_targets(target, env), do: [resolve_module(target, env)]
+
+  defp alias_options(opts) do
+    Enum.map(opts, fn
+      {:as, {:__aliases__, _, parts}} -> {:as, Module.concat(parts)}
+      {key, value} when key in [:as, :warn] and is_atom(value) -> {key, value}
+      _ -> Mix.raise("cannot resolve dynamic alias options")
+    end)
+  end
+
+  defp define_alias(env, meta, module, opts) do
+    case Macro.Env.define_alias(env, meta, module, opts) do
+      {:ok, scope} -> scope
+      {:error, message} -> Mix.raise(message)
+    end
+  end
 
   defp implementations(body) do
     expressions =
@@ -81,8 +161,25 @@ defmodule Mix.Tasks.Si.DocCheck do
   defp function_key({:when, _, [head | _]}), do: function_key(head)
   defp function_key({name, _, args}), do: {name, length(args || [])}
 
-  defp check_module({module, implementations}) do
+  defp check_module({module, implementations, source}) do
     case Code.fetch_docs(module) do
+      {:docs_v1, _, _, _, _, metadata, _} = docs ->
+        if metadata_source(metadata) == source do
+          check_docs(module, implementations, docs)
+        else
+          {0, 0, ["#{inspect(module)}: compiled documentation does not belong to #{source}"]}
+        end
+
+      error ->
+        check_docs(module, implementations, error)
+    end
+  end
+
+  defp metadata_source(%{source_path: path}), do: path |> to_string() |> Path.expand()
+  defp metadata_source(_metadata), do: nil
+
+  defp check_docs(module, implementations, docs) do
+    case docs do
       {:docs_v1, _, _, _, :hidden, _, _} ->
         Mix.shell().info("note: #{inspect(module)}: @moduledoc false (skipped)")
         {0, 0, []}

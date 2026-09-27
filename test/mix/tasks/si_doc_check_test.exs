@@ -134,6 +134,154 @@ defmodule Mix.Tasks.Si.DocCheckTest do
              "Si.DocFixtures.Unavailable: cannot fetch documentation (:module_not_found)\n"
   end
 
+  test "a lexical alias selects the actual documented compiled module", context do
+    path =
+      source!(context, "aliased_documented", """
+      alias Si.DocFixtures.AliasedDocumented, as: DocReviewAlias
+      defmodule DocReviewAlias do
+        @moduledoc "Documented alias target."
+        @doc "Returns its argument."
+        @spec value(term()) :: term()
+        def value(value), do: value
+      end
+      """)
+
+    compile!([path], context.beams)
+    assert capture_io(fn -> DocCheck.run([path]) end) == "ok: 1 modules, 1 functions\n"
+  end
+
+  test "an aliased undocumented module reports its actual qualified names", context do
+    path =
+      source!(context, "aliased_undocumented", """
+      alias Si.DocFixtures.AliasedUndocumented, as: DocReviewAlias
+      defmodule DocReviewAlias do
+        def value(value), do: value
+      end
+      """)
+
+    compile!([path], context.beams)
+
+    assert errors([path]) == """
+           Si.DocFixtures.AliasedUndocumented: missing @moduledoc
+           Si.DocFixtures.AliasedUndocumented.value/1: missing @doc
+           Si.DocFixtures.AliasedUndocumented.value/1: missing @spec
+           """
+  end
+
+  test "an unrelated hidden module matching the raw alias cannot cause a false pass", context do
+    unrelated =
+      source!(context, "unrelated", """
+      defmodule DocReviewAlias do
+        @moduledoc false
+      end
+      """)
+
+    target =
+      source!(context, "aliased_collision", """
+      alias Si.DocFixtures.AliasedCollision, as: DocReviewAlias
+      defmodule DocReviewAlias do
+        def value(value), do: value
+      end
+      """)
+
+    compile!([unrelated, target], context.beams)
+
+    assert errors([target]) == """
+           Si.DocFixtures.AliasedCollision: missing @moduledoc
+           Si.DocFixtures.AliasedCollision.value/1: missing @doc
+           Si.DocFixtures.AliasedCollision.value/1: missing @spec
+           """
+  end
+
+  test "alias bindings are inherited but child rebindings do not leak to file scope", context do
+    path =
+      source!(context, "alias_scopes", """
+      alias Si.DocFixtures.ScopeTarget, as: ScopeReviewAlias
+      defmodule Si.DocFixtures.ScopeContainer do
+        @moduledoc false
+        alias String, as: ScopeReviewAlias
+        @doc false
+        def trim(value), do: ScopeReviewAlias.trim(value)
+      end
+      defmodule ScopeReviewAlias do
+        @moduledoc "The outer alias survives."
+      end
+      """)
+
+    compile!([path], context.beams)
+
+    assert capture_io(fn -> DocCheck.run([path]) end) ==
+             "note: Si.DocFixtures.ScopeContainer: @moduledoc false (skipped)\nok: 1 modules, 0 functions\n"
+  end
+
+  test "grouped and chained aliases resolve through the compiler environment", context do
+    path =
+      source!(context, "alias_groups", """
+      alias Si.DocFixtures, as: FixtureRoot
+      alias FixtureRoot.{GroupedFirst, GroupedSecond}
+      defmodule GroupedFirst do
+        @moduledoc "First grouped target."
+      end
+      defmodule GroupedSecond do
+        @moduledoc "Second grouped target."
+      end
+      """)
+
+    compile!([path], context.beams)
+    assert capture_io(fn -> DocCheck.run([path]) end) == "ok: 2 modules, 0 functions\n"
+  end
+
+  test "explicit absolute and __MODULE__ nested names use their native scopes", context do
+    path =
+      source!(context, "absolute_modules", """
+      defmodule Si.DocFixtures.AbsoluteContainer do
+        @moduledoc "Container."
+        defmodule __MODULE__.Child do
+          @moduledoc "Relative to the current module."
+        end
+        defmodule Elixir.Si.DocFixtures.AbsoluteSibling do
+          @moduledoc "Explicitly absolute."
+        end
+      end
+      """)
+
+    compile!([path], context.beams)
+    assert capture_io(fn -> DocCheck.run([path]) end) == "ok: 3 modules, 0 functions\n"
+  end
+
+  test "unresolved module expressions fail visibly without evaluating source", context do
+    path =
+      source!(context, "dynamic_module", """
+      defmodule (send(self(), :doc_check_evaluated_source); Si.DocFixtures.Dynamic) do
+        @moduledoc false
+      end
+      """)
+
+    assert_raise Mix.Error, "cannot resolve dynamic module name", fn -> DocCheck.run([path]) end
+    refute_received :doc_check_evaluated_source
+  end
+
+  test "metadata from another source cannot satisfy a supplied declaration", context do
+    owner =
+      source!(context, "metadata_owner", """
+      defmodule Si.DocFixtures.MetadataOwner do
+        @moduledoc false
+      end
+      """)
+
+    other =
+      source!(context, "metadata_other", """
+      defmodule Si.DocFixtures.MetadataOwner do
+        def undocumented, do: :ok
+      end
+      """)
+
+    compile!([owner], context.beams)
+
+    assert errors([other]) ==
+             "Si.DocFixtures.MetadataOwner: compiled documentation does not belong to #{other}\n"
+  end
+
   test "usage exits 2 without compiling", _context do
     assert capture_io(:stderr, fn ->
              assert catch_exit(DocCheck.run([])) == {:shutdown, 2}
