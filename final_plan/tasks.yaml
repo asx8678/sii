@@ -1,0 +1,1137 @@
+# Machine-readable task list. Update `status` as work progresses: todo | in_progress | review | done | blocked.
+# Generated from the plan; keep ids, dependencies and files in sync with the task files.
+tasks:
+  - id: T00.01
+    title: "Repository and Phoenix app skeleton"
+    milestone: M00
+    layer: platform
+    depends_on: []
+    size: S
+    astra_path: true
+    file: tasks/M00-foundation/T00.01-repository-and-phoenix-app-skeleton.md
+    status: todo
+  - id: T00.02
+    title: "Dependencies, lint, `bin/ci` and task checks"
+    milestone: M00
+    layer: platform
+    depends_on: [T00.01]
+    size: M
+    astra_path: true
+    file: tasks/M00-foundation/T00.02-dependencies-lint-bin-ci-and-task-checks.md
+    status: todo
+  - id: T00.03
+    title: "`Si.Paths` and `$SI_HOME`"
+    milestone: M00
+    layer: platform
+    depends_on: [T00.02]
+    size: S
+    astra_path: true
+    file: tasks/M00-foundation/T00.03-si-paths-and-si-home.md
+    status: todo
+  - id: T00.04
+    title: "Settings loader (`Si.Settings`)"
+    milestone: M00
+    layer: platform
+    depends_on: [T00.03]
+    size: M
+    astra_path: true
+    file: tasks/M00-foundation/T00.04-settings-loader-si-settings.md
+    status: todo
+  - id: T00.05
+    title: "SQLite configuration and test isolation"
+    milestone: M00
+    layer: platform
+    depends_on: [T00.03]
+    size: S
+    astra_path: true
+    file: tasks/M00-foundation/T00.05-sqlite-configuration-and-test-isolation.md
+    status: todo
+  - id: T00.06
+    title: "IDs (`Si.Id`)"
+    milestone: M00
+    layer: platform
+    depends_on: [T00.02]
+    size: S
+    astra_path: true
+    file: tasks/M00-foundation/T00.06-ids-si-id.md
+    status: todo
+  - id: T00.07
+    title: "Event log (`Si.Events`)"
+    milestone: M00
+    layer: platform
+    depends_on: [T00.05, T00.06]
+    size: M
+    astra_path: true
+    file: tasks/M00-foundation/T00.07-event-log-si-events.md
+    status: todo
+  - id: T00.08
+    title: "Tracing helper (`Si.Trace`)"
+    milestone: M00
+    layer: platform
+    depends_on: [T00.02]
+    size: S
+    astra_path: false
+    file: tasks/M00-foundation/T00.08-tracing-helper-si-trace.md
+    status: todo
+  - id: T00.09
+    title: "CLI transport: `si` escript and `Si.CLI.Server`"
+    milestone: M00
+    layer: platform
+    depends_on: [T00.03]
+    size: M
+    astra_path: true
+    file: tasks/M00-foundation/T00.09-cli-transport-si-escript-and-si-cli-server.md
+    status: todo
+  - id: T00.10
+    title: "Cockpit shell and `/health`"
+    milestone: M00
+    layer: platform
+    depends_on: [T00.01]
+    size: S
+    astra_path: false
+    file: tasks/M00-foundation/T00.10-cockpit-shell-and-health.md
+    status: todo
+  - id: T00.11
+    title: "Test support helpers"
+    milestone: M00
+    layer: platform
+    depends_on: [T00.03, T00.05]
+    size: S
+    astra_path: true
+    file: tasks/M00-foundation/T00.11-test-support-helpers.md
+    status: todo
+  - id: T00.12
+    title: "Cockpit access protection"
+    milestone: M00
+    layer: platform
+    depends_on: [T00.10, T00.09]
+    size: S
+    astra_path: false
+    file: tasks/M00-foundation/T00.12-cockpit-access-protection.md
+    status: todo
+  - id: T01.01
+    title: "`Si.Git` command wrapper and parsing"
+    milestone: M01
+    layer: git
+    depends_on: [T00.11]
+    size: M
+    astra_path: true
+    file: tasks/M01-git-and-repositories/T01.01-si-git-command-wrapper-and-parsing.md
+    status: todo
+  - id: T01.02
+    title: "Repository registry and `si repo add/list/show`"
+    milestone: M01
+    layer: git
+    depends_on: [T01.01, T00.07, T00.09]
+    size: M
+    astra_path: true
+    file: tasks/M01-git-and-repositories/T01.02-repository-registry-and-si-repo-add-list-show.md
+    status: todo
+  - id: T01.03
+    title: "Repo profile: schema, detection and `si repo init`"
+    milestone: M01
+    layer: git
+    depends_on: [T01.02, T00.04]
+    size: M
+    astra_path: true
+    file: tasks/M01-git-and-repositories/T01.03-repo-profile-schema-detection-and-si-repo-init.md
+    status: todo
+  - id: T01.04
+    title: "Worktree manager with copy-on-write caches"
+    milestone: M01
+    layer: git
+    depends_on: [T01.02]
+    size: M
+    astra_path: true
+    file: tasks/M01-git-and-repositories/T01.04-worktree-manager-with-copy-on-write-caches.md
+    status: todo
+  - id: T01.05
+    title: "Freeze: snapshots of worktrees and refs"
+    milestone: M01
+    layer: git
+    depends_on: [T01.04]
+    size: M
+    astra_path: true
+    file: tasks/M01-git-and-repositories/T01.05-freeze-snapshots-of-worktrees-and-refs.md
+    status: todo
+  - id: T01.06
+    title: "Check pool"
+    milestone: M01
+    layer: git
+    depends_on: [T01.04, T01.03]
+    size: M
+    astra_path: true
+    file: tasks/M01-git-and-repositories/T01.06-check-pool.md
+    status: todo
+  - id: T02.01
+    title: "Check command runner"
+    milestone: M02
+    layer: checks
+    depends_on: [T01.06]
+    size: M
+    astra_path: true
+    file: tasks/M02-checks/T02.01-check-command-runner.md
+    status: todo
+  - id: T02.02
+    title: "Diff analysis (`Si.Diff`)"
+    milestone: M02
+    layer: checks
+    depends_on: [T01.01]
+    size: M
+    astra_path: true
+    file: tasks/M02-checks/T02.02-diff-analysis-si-diff.md
+    status: todo
+  - id: T02.03
+    title: "Check pipeline, results and `si check`"
+    milestone: M02
+    layer: checks
+    depends_on: [T02.01, T02.02, T01.05]
+    size: M
+    astra_path: true
+    file: tasks/M02-checks/T02.03-check-pipeline-results-and-si-check.md
+    status: todo
+  - id: T02.04
+    title: "Format, build, lint and tests checks"
+    milestone: M02
+    layer: checks
+    depends_on: [T02.03]
+    size: M
+    astra_path: true
+    file: tasks/M02-checks/T02.04-format-build-lint-and-tests-checks.md
+    status: todo
+  - id: T02.05
+    title: "Test-integrity check"
+    milestone: M02
+    layer: checks
+    depends_on: [T02.03]
+    size: M
+    astra_path: true
+    file: tasks/M02-checks/T02.05-test-integrity-check.md
+    status: todo
+  - id: T02.06
+    title: "Scope check and glob matching"
+    milestone: M02
+    layer: checks
+    depends_on: [T02.03]
+    size: S
+    astra_path: false
+    file: tasks/M02-checks/T02.06-scope-check-and-glob-matching.md
+    status: todo
+  - id: T02.07
+    title: "Diff coverage check (LCOV)"
+    milestone: M02
+    layer: checks
+    depends_on: [T02.03, T02.04]
+    size: M
+    astra_path: false
+    file: tasks/M02-checks/T02.07-diff-coverage-check-lcov.md
+    status: todo
+  - id: T02.08
+    title: "Mutation check (Stryker report)"
+    milestone: M02
+    layer: checks
+    depends_on: [T02.03, T02.04]
+    size: M
+    astra_path: false
+    file: tasks/M02-checks/T02.08-mutation-check-stryker-report.md
+    status: todo
+  - id: T03.01
+    title: "Toolchain manager"
+    milestone: M03
+    layer: sessions
+    depends_on: [T00.04, T00.07, T00.09]
+    size: M
+    astra_path: true
+    file: tasks/M03-pi-sessions/T03.01-toolchain-manager.md
+    status: todo
+  - id: T03.02
+    title: "Profiles (Pi agent directories per role)"
+    milestone: M03
+    layer: sessions
+    depends_on: [T03.01]
+    size: S
+    astra_path: true
+    file: tasks/M03-pi-sessions/T03.02-profiles-pi-agent-directories-per-role.md
+    status: todo
+  - id: T03.03
+    title: "Scripted provider `si-faux` and `Si.Test.Faux`"
+    milestone: M03
+    layer: sessions
+    depends_on: [T03.01]
+    size: M
+    astra_path: true
+    file: tasks/M03-pi-sessions/T03.03-scripted-provider-si-faux-and-si-test-faux.md
+    status: todo
+  - id: T03.04
+    title: "Runner behaviour, local Port runner and OS process helpers"
+    milestone: M03
+    layer: sessions
+    depends_on: [T00.03]
+    size: M
+    astra_path: true
+    file: tasks/M03-pi-sessions/T03.04-runner-behaviour-local-port-runner-and-os-process-helpers.md
+    status: todo
+  - id: T03.05
+    title: "Pi RPC framing and command correlation"
+    milestone: M03
+    layer: sessions
+    depends_on: [T03.04]
+    size: M
+    astra_path: true
+    file: tasks/M03-pi-sessions/T03.05-pi-rpc-framing-and-command-correlation.md
+    status: todo
+  - id: T03.06
+    title: "Session schema and controller state machine"
+    milestone: M03
+    layer: sessions
+    depends_on: [T03.05, T00.07]
+    size: L
+    astra_path: true
+    file: tasks/M03-pi-sessions/T03.06-session-schema-and-controller-state-machine.md
+    status: todo
+  - id: T03.07
+    title: "Sessions API, supervisor and `si session` CLI"
+    milestone: M03
+    layer: sessions
+    depends_on: [T03.06, T03.02, T03.03, T00.09]
+    size: M
+    astra_path: true
+    file: tasks/M03-pi-sessions/T03.07-sessions-api-supervisor-and-si-session-cli.md
+    status: todo
+  - id: T03.08
+    title: "Cockpit Sessions page"
+    milestone: M03
+    layer: sessions
+    depends_on: [T03.07, T00.10]
+    size: S
+    astra_path: false
+    file: tasks/M03-pi-sessions/T03.08-cockpit-sessions-page.md
+    status: todo
+  - id: T04.01
+    title: "Bridge protocol schemas and validation"
+    milestone: M04
+    layer: bridge
+    depends_on: [T00.02]
+    size: M
+    astra_path: true
+    file: tasks/M04-si-bridge/T04.01-bridge-protocol-schemas-and-validation.md
+    status: todo
+  - id: T04.02
+    title: "Bridge token, socket and session channel"
+    milestone: M04
+    layer: bridge
+    depends_on: [T04.01, T03.07]
+    size: M
+    astra_path: true
+    file: tasks/M04-si-bridge/T04.02-bridge-token-socket-and-session-channel.md
+    status: todo
+  - id: T04.03
+    title: "Bridge package scaffold"
+    milestone: M04
+    layer: bridge
+    depends_on: [T04.01]
+    size: S
+    astra_path: true
+    file: tasks/M04-si-bridge/T04.03-bridge-package-scaffold.md
+    status: todo
+  - id: T04.04
+    title: "Bridge connection, join and status"
+    milestone: M04
+    layer: bridge
+    depends_on: [T04.03, T04.02]
+    size: M
+    astra_path: true
+    file: tasks/M04-si-bridge/T04.04-bridge-connection-join-and-status.md
+    status: todo
+  - id: T04.05
+    title: "Event forwarding (bridge side)"
+    milestone: M04
+    layer: bridge
+    depends_on: [T04.04]
+    size: M
+    astra_path: false
+    file: tasks/M04-si-bridge/T04.05-event-forwarding-bridge-side.md
+    status: todo
+  - id: T04.06
+    title: "Event ingestion and analytics tables"
+    milestone: M04
+    layer: bridge
+    depends_on: [T04.05, T04.02]
+    size: M
+    astra_path: false
+    file: tasks/M04-si-bridge/T04.06-event-ingestion-and-analytics-tables.md
+    status: todo
+  - id: T04.07
+    title: "`si_*` tools"
+    milestone: M04
+    layer: bridge
+    depends_on: [T04.04]
+    size: M
+    astra_path: true
+    file: tasks/M04-si-bridge/T04.07-si-tools.md
+    status: todo
+  - id: T04.08
+    title: "Controls"
+    milestone: M04
+    layer: bridge
+    depends_on: [T04.04]
+    size: M
+    astra_path: false
+    file: tasks/M04-si-bridge/T04.08-controls.md
+    status: todo
+  - id: T04.09
+    title: "Slot gate"
+    milestone: M04
+    layer: bridge
+    depends_on: [T04.04, T04.05]
+    size: M
+    astra_path: false
+    file: tasks/M04-si-bridge/T04.09-slot-gate.md
+    status: todo
+  - id: T04.10
+    title: "Fabric execution trace extraction"
+    milestone: M04
+    layer: bridge
+    depends_on: [T04.05]
+    size: S
+    astra_path: false
+    file: tasks/M04-si-bridge/T04.10-fabric-execution-trace-extraction.md
+    status: todo
+  - id: T04.11
+    title: "Contract tests and overhead measurement"
+    milestone: M04
+    layer: bridge
+    depends_on: [T04.07, T04.08, T04.09, T04.05, T04.06]
+    size: M
+    astra_path: false
+    file: tasks/M04-si-bridge/T04.11-contract-tests-and-overhead-measurement.md
+    status: todo
+  - id: T04.12
+    title: "Opt-in for your terminal sessions"
+    milestone: M04
+    layer: bridge
+    depends_on: [T04.08]
+    size: S
+    astra_path: false
+    file: tasks/M04-si-bridge/T04.12-opt-in-for-your-terminal-sessions.md
+    status: todo
+  - id: T05.01
+    title: "Model families and diversity rules"
+    milestone: M05
+    layer: review
+    depends_on: [T00.04]
+    size: S
+    astra_path: true
+    file: tasks/M05-astra/T05.01-model-families-and-diversity-rules.md
+    status: todo
+  - id: T05.02
+    title: "Verdicts, reviews and findings"
+    milestone: M05
+    layer: review
+    depends_on: [T04.01, T00.07, T01.05]
+    size: M
+    astra_path: true
+    file: tasks/M05-astra/T05.02-verdicts-reviews-and-findings.md
+    status: todo
+  - id: T05.03
+    title: "Astra prompts and review context"
+    milestone: M05
+    layer: review
+    depends_on: [T05.02, T02.03]
+    size: M
+    astra_path: true
+    file: tasks/M05-astra/T05.03-astra-prompts-and-review-context.md
+    status: todo
+  - id: T05.04
+    title: "Review run (one round)"
+    milestone: M05
+    layer: review
+    depends_on: [T05.03, T05.01, T04.07, T03.07, T01.04]
+    size: L
+    astra_path: true
+    file: tasks/M05-astra/T05.04-review-run-one-round.md
+    status: todo
+  - id: T05.05
+    title: "`si review` CLI"
+    milestone: M05
+    layer: review
+    depends_on: [T05.04, T02.04]
+    size: M
+    astra_path: true
+    file: tasks/M05-astra/T05.05-si-review-cli.md
+    status: todo
+  - id: T05.06
+    title: "Inbox v1"
+    milestone: M05
+    layer: review
+    depends_on: [T00.07, T00.09, T03.07]
+    size: M
+    astra_path: true
+    file: tasks/M05-astra/T05.06-inbox-v1.md
+    status: todo
+  - id: T05.07
+    title: "Review rounds, earlier findings and escalation"
+    milestone: M05
+    layer: review
+    depends_on: [T05.05, T05.06]
+    size: M
+    astra_path: true
+    file: tasks/M05-astra/T05.07-review-rounds-earlier-findings-and-escalation.md
+    status: todo
+  - id: T05.08
+    title: "Astra fix mode"
+    milestone: M05
+    layer: review
+    depends_on: [T05.07, T04.08, T04.11]
+    size: L
+    astra_path: false
+    file: tasks/M05-astra/T05.08-astra-fix-mode.md
+    status: todo
+  - id: T05.09
+    title: "Cockpit Reviews and Inbox pages"
+    milestone: M05
+    layer: review
+    depends_on: [T05.07, T00.10]
+    size: M
+    astra_path: false
+    file: tasks/M05-astra/T05.09-cockpit-reviews-and-inbox-pages.md
+    status: todo
+  - id: T05.10
+    title: "Dogfooding: Si's own profile and `bin/task-review`"
+    milestone: M05
+    layer: review
+    depends_on: [T05.07]
+    size: S
+    astra_path: true
+    file: tasks/M05-astra/T05.10-dogfooding-sis-own-profile-and-bin-task-review.md
+    status: todo
+  - id: T05.11
+    title: "First-run setup, settings writer, approval policy and user guide"
+    milestone: M05
+    layer: review
+    depends_on: [T05.05, T01.03]
+    size: M
+    astra_path: false
+    file: tasks/M05-astra/T05.11-first-run-setup-settings-writer-approval-policy-and-user-gui.md
+    status: todo
+  - id: T05.12
+    title: "Start reviews from the cockpit"
+    milestone: M05
+    layer: review
+    depends_on: [T05.09, T05.05, T00.12]
+    size: M
+    astra_path: false
+    file: tasks/M05-astra/T05.12-start-reviews-from-the-cockpit.md
+    status: todo
+  - id: T06.01
+    title: "Task board and state machine"
+    milestone: M06
+    layer: tasks
+    depends_on: [T00.07, T01.02]
+    size: M
+    astra_path: false
+    file: tasks/M06-tasks-and-the-single-worker-loop/T06.01-task-board-and-state-machine.md
+    status: todo
+  - id: T06.02
+    title: "Task CLI and cockpit Tasks page"
+    milestone: M06
+    layer: tasks
+    depends_on: [T06.01, T00.09, T00.10]
+    size: S
+    astra_path: false
+    file: tasks/M06-tasks-and-the-single-worker-loop/T06.02-task-cli-and-cockpit-tasks-page.md
+    status: todo
+  - id: T06.03
+    title: "`si_task`, `si_report` and `si_ask` handlers"
+    milestone: M06
+    layer: tasks
+    depends_on: [T06.01, T04.07, T05.06]
+    size: M
+    astra_path: false
+    file: tasks/M06-tasks-and-the-single-worker-loop/T06.03-si-task-si-report-and-si-ask-handlers.md
+    status: todo
+  - id: T06.04
+    title: "Dispatcher (one worker)"
+    milestone: M06
+    layer: tasks
+    depends_on: [T06.03, T03.07, T01.04, T05.11]
+    size: L
+    astra_path: false
+    file: tasks/M06-tasks-and-the-single-worker-loop/T06.04-dispatcher-one-worker.md
+    status: todo
+  - id: T06.05
+    title: "Build–check–review loop"
+    milestone: M06
+    layer: tasks
+    depends_on: [T06.04, T05.07, T05.08]
+    size: L
+    astra_path: false
+    file: tasks/M06-tasks-and-the-single-worker-loop/T06.05-build-check-review-loop.md
+    status: todo
+  - id: T06.06
+    title: "Merge queue v1"
+    milestone: M06
+    layer: tasks
+    depends_on: [T06.05, T02.03]
+    size: L
+    astra_path: false
+    file: tasks/M06-tasks-and-the-single-worker-loop/T06.06-merge-queue-v1.md
+    status: todo
+  - id: T06.07
+    title: "Delivery to a branch, commit trailers and cleanup"
+    milestone: M06
+    layer: tasks
+    depends_on: [T06.06]
+    size: M
+    astra_path: false
+    file: tasks/M06-tasks-and-the-single-worker-loop/T06.07-delivery-to-a-branch-commit-trailers-and-cleanup.md
+    status: todo
+  - id: T06.08
+    title: "Run ledger v1"
+    milestone: M06
+    layer: tasks
+    depends_on: [T06.05]
+    size: M
+    astra_path: false
+    file: tasks/M06-tasks-and-the-single-worker-loop/T06.08-run-ledger-v1.md
+    status: todo
+  - id: T06.09
+    title: "Tasks and session actions in the cockpit"
+    milestone: M06
+    layer: tasks
+    depends_on: [T06.02, T04.08, T00.12]
+    size: M
+    astra_path: false
+    file: tasks/M06-tasks-and-the-single-worker-loop/T06.09-tasks-and-session-actions-in-the-cockpit.md
+    status: todo
+  - id: T07.01
+    title: "Eval task format and `si eval task new`"
+    milestone: M07
+    layer: evals
+    depends_on: [T01.05, T01.03]
+    size: M
+    astra_path: false
+    file: tasks/M07-eval-harness-and-targets/T07.01-eval-task-format-and-si-eval-task-new.md
+    status: todo
+  - id: T07.02
+    title: "Arms runner"
+    milestone: M07
+    layer: evals
+    depends_on: [T07.01, T06.07]
+    size: L
+    astra_path: false
+    file: tasks/M07-eval-harness-and-targets/T07.02-arms-runner.md
+    status: todo
+  - id: T07.03
+    title: "Scoring, repeats, confidence intervals and report"
+    milestone: M07
+    layer: evals
+    depends_on: [T07.02]
+    size: M
+    astra_path: false
+    file: tasks/M07-eval-harness-and-targets/T07.03-scoring-repeats-confidence-intervals-and-report.md
+    status: todo
+  - id: T07.04
+    title: "Targets and seed suite"
+    milestone: M07
+    layer: evals
+    depends_on: [T07.03]
+    size: M
+    astra_path: false
+    file: tasks/M07-eval-harness-and-targets/T07.04-targets-and-seed-suite.md
+    status: todo
+  - id: T08.01
+    title: "Pricing and cost per model call"
+    milestone: M08
+    layer: capacity
+    depends_on: [T04.06]
+    size: S
+    astra_path: false
+    file: tasks/M08-capacity-cost-budgets-scheduler-memory/T08.01-pricing-and-cost-per-model-call.md
+    status: todo
+  - id: T08.02
+    title: "Budgets"
+    milestone: M08
+    layer: capacity
+    depends_on: [T08.01, T05.06, T05.04, T06.05, T08.03]
+    size: M
+    astra_path: false
+    file: tasks/M08-capacity-cost-budgets-scheduler-memory/T08.02-budgets.md
+    status: todo
+  - id: T08.03
+    title: "Scheduler core"
+    milestone: M08
+    layer: capacity
+    depends_on: [T08.01]
+    size: L
+    astra_path: false
+    file: tasks/M08-capacity-cost-budgets-scheduler-memory/T08.03-scheduler-core.md
+    status: todo
+  - id: T08.04
+    title: "Admission through the bridge, pause and freeze-all"
+    milestone: M08
+    layer: capacity
+    depends_on: [T08.03, T04.09, T08.02]
+    size: M
+    astra_path: false
+    file: tasks/M08-capacity-cost-budgets-scheduler-memory/T08.04-admission-through-the-bridge-pause-and-freeze-all.md
+    status: todo
+  - id: T08.05
+    title: "Memory measurement and admission"
+    milestone: M08
+    layer: capacity
+    depends_on: [T03.07]
+    size: M
+    astra_path: false
+    file: tasks/M08-capacity-cost-budgets-scheduler-memory/T08.05-memory-measurement-and-admission.md
+    status: todo
+  - id: T08.06
+    title: "Warm slots"
+    milestone: M08
+    layer: capacity
+    depends_on: [T08.05, T06.04]
+    size: M
+    astra_path: false
+    file: tasks/M08-capacity-cost-budgets-scheduler-memory/T08.06-warm-slots.md
+    status: todo
+  - id: T08.07
+    title: "Fallback ladders and model switch between turns"
+    milestone: M08
+    layer: capacity
+    depends_on: [T08.03, T04.08]
+    size: M
+    astra_path: false
+    file: tasks/M08-capacity-cost-budgets-scheduler-memory/T08.07-fallback-ladders-and-model-switch-between-turns.md
+    status: todo
+  - id: T08.08
+    title: "Parallel workers"
+    milestone: M08
+    layer: capacity
+    depends_on: [T08.04, T08.06]
+    size: M
+    astra_path: false
+    file: tasks/M08-capacity-cost-budgets-scheduler-memory/T08.08-parallel-workers.md
+    status: todo
+  - id: T08.09
+    title: "Cache discipline"
+    milestone: M08
+    layer: capacity
+    depends_on: [T04.09, T08.01]
+    size: M
+    astra_path: false
+    file: tasks/M08-capacity-cost-budgets-scheduler-memory/T08.09-cache-discipline.md
+    status: todo
+  - id: T09.01
+    title: "Workflow schema, loader, templates and hashing"
+    milestone: M09
+    layer: workflows
+    depends_on: [T00.04]
+    size: M
+    astra_path: false
+    file: tasks/M09-workflows-and-planning/T09.01-workflow-schema-loader-templates-and-hashing.md
+    status: todo
+  - id: T09.02
+    title: "Workflow validator and `si workflow check`"
+    milestone: M09
+    layer: workflows
+    depends_on: [T09.01, T03.03, T05.01, T00.09]
+    size: M
+    astra_path: false
+    file: tasks/M09-workflows-and-planning/T09.02-workflow-validator-and-si-workflow-check.md
+    status: todo
+  - id: T09.03
+    title: "Run runtime with resume"
+    milestone: M09
+    layer: workflows
+    depends_on: [T09.02, T06.05]
+    size: L
+    astra_path: false
+    file: tasks/M09-workflows-and-planning/T09.03-run-runtime-with-resume.md
+    status: todo
+  - id: T09.04
+    title: "Lead planning session and `si_plan`"
+    milestone: M09
+    layer: workflows
+    depends_on: [T09.03, T04.07]
+    size: L
+    astra_path: false
+    file: tasks/M09-workflows-and-planning/T09.04-lead-planning-session-and-si-plan.md
+    status: todo
+  - id: T09.05
+    title: "Plan critique, gate and revisions"
+    milestone: M09
+    layer: workflows
+    depends_on: [T09.04, T05.04]
+    size: M
+    astra_path: false
+    file: tasks/M09-workflows-and-planning/T09.05-plan-critique-gate-and-revisions.md
+    status: todo
+  - id: T09.06
+    title: "Fan-out, sticky workers and scope requests"
+    milestone: M09
+    layer: workflows
+    depends_on: [T09.04, T08.08, T02.06, T06.07]
+    size: L
+    astra_path: false
+    file: tasks/M09-workflows-and-planning/T09.06-fan-out-sticky-workers-and-scope-requests.md
+    status: todo
+  - id: T09.07
+    title: "Acceptance review and fresh final reviewer"
+    milestone: M09
+    layer: workflows
+    depends_on: [T09.06, T05.07]
+    size: M
+    astra_path: false
+    file: tasks/M09-workflows-and-planning/T09.07-acceptance-review-and-fresh-final-reviewer.md
+    status: todo
+  - id: T09.08
+    title: "Intake: tiers, escalators, estimate and `si run`"
+    milestone: M09
+    layer: workflows
+    depends_on: [T09.03, T06.08]
+    size: M
+    astra_path: false
+    file: tasks/M09-workflows-and-planning/T09.08-intake-tiers-escalators-estimate-and-si-run.md
+    status: todo
+  - id: T09.09
+    title: "Merge queue v2: batches and bisect"
+    milestone: M09
+    layer: workflows
+    depends_on: [T06.06]
+    size: M
+    astra_path: false
+    file: tasks/M09-workflows-and-planning/T09.09-merge-queue-v2-batches-and-bisect.md
+    status: todo
+  - id: T09.10
+    title: "Delivery targets: pull request, patch, local merge"
+    milestone: M09
+    layer: workflows
+    depends_on: [T06.07, T05.06]
+    size: M
+    astra_path: false
+    file: tasks/M09-workflows-and-planning/T09.10-delivery-targets-pull-request-patch-local-merge.md
+    status: todo
+  - id: T09.11
+    title: "Templates review-only and fix-tests"
+    milestone: M09
+    layer: workflows
+    depends_on: [T09.03, T05.07]
+    size: M
+    astra_path: false
+    file: tasks/M09-workflows-and-planning/T09.11-templates-review-only-and-fix-tests.md
+    status: todo
+  - id: T09.12
+    title: "Start runs from the cockpit"
+    milestone: M09
+    layer: workflows
+    depends_on: [T09.08, T06.09]
+    size: S
+    astra_path: false
+    file: tasks/M09-workflows-and-planning/T09.12-start-runs-from-the-cockpit.md
+    status: todo
+  - id: T10.01
+    title: "Adapter scaffold, framing and supervisor"
+    milestone: M10
+    layer: adapter
+    depends_on: [T03.01]
+    size: M
+    astra_path: false
+    file: tasks/M10-si-adapter-and-fovea/T10.01-adapter-scaffold-framing-and-supervisor.md
+    status: todo
+  - id: T10.02
+    title: "Fovea cache seeding"
+    milestone: M10
+    layer: adapter
+    depends_on: [T10.01, T01.04]
+    size: M
+    astra_path: false
+    file: tasks/M10-si-adapter-and-fovea/T10.02-fovea-cache-seeding.md
+    status: todo
+  - id: T10.03
+    title: "Fovea impact and affected tests"
+    milestone: M10
+    layer: adapter
+    depends_on: [T10.01, T02.04, T05.03]
+    size: M
+    astra_path: false
+    file: tasks/M10-si-adapter-and-fovea/T10.03-fovea-impact-and-affected-tests.md
+    status: todo
+  - id: T10.04
+    title: "Fabric child usage"
+    milestone: M10
+    layer: adapter
+    depends_on: [T10.01, T04.06]
+    size: S
+    astra_path: false
+    file: tasks/M10-si-adapter-and-fovea/T10.04-fabric-child-usage.md
+    status: todo
+  - id: T10.05
+    title: "Fabric mesh reading and cockpit panel"
+    milestone: M10
+    layer: adapter
+    depends_on: [T10.01, T04.12]
+    size: M
+    astra_path: false
+    file: tasks/M10-si-adapter-and-fovea/T10.05-fabric-mesh-reading-and-cockpit-panel.md
+    status: todo
+  - id: T11.01
+    title: "Reconciler framework"
+    milestone: M11
+    layer: reliability
+    depends_on: [T00.07]
+    size: M
+    astra_path: false
+    file: tasks/M11-reliability/T11.01-reconciler-framework.md
+    status: todo
+  - id: T11.02
+    title: "Sessions reconciler"
+    milestone: M11
+    layer: reliability
+    depends_on: [T11.01, T03.07]
+    size: M
+    astra_path: false
+    file: tasks/M11-reliability/T11.02-sessions-reconciler.md
+    status: todo
+  - id: T11.03
+    title: "Worktrees reconciler"
+    milestone: M11
+    layer: reliability
+    depends_on: [T11.01, T01.04]
+    size: M
+    astra_path: false
+    file: tasks/M11-reliability/T11.03-worktrees-reconciler.md
+    status: todo
+  - id: T11.04
+    title: "Check pool reconciler"
+    milestone: M11
+    layer: reliability
+    depends_on: [T11.01, T01.06]
+    size: S
+    astra_path: false
+    file: tasks/M11-reliability/T11.04-check-pool-reconciler.md
+    status: todo
+  - id: T11.05
+    title: "Merge queue reconciler"
+    milestone: M11
+    layer: reliability
+    depends_on: [T11.01, T06.06]
+    size: M
+    astra_path: false
+    file: tasks/M11-reliability/T11.05-merge-queue-reconciler.md
+    status: todo
+  - id: T11.06
+    title: "Runs reconciler"
+    milestone: M11
+    layer: reliability
+    depends_on: [T11.01, T09.03]
+    size: M
+    astra_path: false
+    file: tasks/M11-reliability/T11.06-runs-reconciler.md
+    status: todo
+  - id: T11.07
+    title: "Fovea cache reconciler"
+    milestone: M11
+    layer: reliability
+    depends_on: [T11.01, T10.02]
+    size: S
+    astra_path: false
+    file: tasks/M11-reliability/T11.07-fovea-cache-reconciler.md
+    status: todo
+  - id: T11.08
+    title: "Version pinning per run and upgrade check"
+    milestone: M11
+    layer: reliability
+    depends_on: [T04.11, T09.03, T05.11]
+    size: M
+    astra_path: false
+    file: tasks/M11-reliability/T11.08-version-pinning-per-run-and-upgrade-check.md
+    status: todo
+  - id: T11.09
+    title: "Chaos tests"
+    milestone: M11
+    layer: reliability
+    depends_on: [T11.02, T11.03, T11.04, T11.05, T11.06]
+    size: M
+    astra_path: false
+    file: tasks/M11-reliability/T11.09-chaos-tests.md
+    status: todo
+  - id: T11.10
+    title: "Backups"
+    milestone: M11
+    layer: reliability
+    depends_on: [T00.05, T00.09]
+    size: S
+    astra_path: false
+    file: tasks/M11-reliability/T11.10-backups.md
+    status: todo
+  - id: T11.11
+    title: "Retention and `si gc`"
+    milestone: M11
+    layer: reliability
+    depends_on: [T11.01, T06.07, T07.03]
+    size: M
+    astra_path: false
+    file: tasks/M11-reliability/T11.11-retention-and-si-gc.md
+    status: todo
+  - id: T11.12
+    title: "Release build, background service and PATH install"
+    milestone: M11
+    layer: reliability
+    depends_on: [T00.09, T04.03, T11.10]
+    size: M
+    astra_path: false
+    file: tasks/M11-reliability/T11.12-release-build-background-service-and-path-install.md
+    status: todo
+  - id: T12.01
+    title: "Deterministic signals"
+    milestone: M12
+    layer: supervision
+    depends_on: [T04.06, T06.05, T08.09]
+    size: M
+    astra_path: false
+    file: tasks/M12-signals-judgments-and-the-lead/T12.01-deterministic-signals.md
+    status: todo
+  - id: T12.02
+    title: "Jev client and Foreman's questions"
+    milestone: M12
+    layer: supervision
+    depends_on: [T12.01]
+    size: M
+    astra_path: false
+    file: tasks/M12-signals-judgments-and-the-lead/T12.02-jev-client-and-foremans-questions.md
+    status: todo
+  - id: T12.03
+    title: "Intervention ladder"
+    milestone: M12
+    layer: supervision
+    depends_on: [T12.01, T04.08, T08.02]
+    size: M
+    astra_path: false
+    file: tasks/M12-signals-judgments-and-the-lead/T12.03-intervention-ladder.md
+    status: todo
+  - id: T12.04
+    title: "Lead activations"
+    milestone: M12
+    layer: supervision
+    depends_on: [T12.03, T09.04, T06.08, T09.05]
+    size: M
+    astra_path: false
+    file: tasks/M12-signals-judgments-and-the-lead/T12.04-lead-activations.md
+    status: todo
+  - id: T12.05
+    title: "Reviewer canaries"
+    milestone: M12
+    layer: supervision
+    depends_on: [T05.07]
+    size: M
+    astra_path: false
+    file: tasks/M12-signals-judgments-and-the-lead/T12.05-reviewer-canaries.md
+    status: todo
+  - id: T12.06
+    title: "Disputes and arbitration"
+    milestone: M12
+    layer: supervision
+    depends_on: [T05.07, T06.03]
+    size: M
+    astra_path: false
+    file: tasks/M12-signals-judgments-and-the-lead/T12.06-disputes-and-arbitration.md
+    status: todo
+  - id: T13.01
+    title: "Model catalog capabilities and `si models`"
+    milestone: M13
+    layer: models
+    depends_on: [T05.01, T08.01]
+    size: S
+    astra_path: false
+    file: tasks/M13-models-routing-and-analytics/T13.01-model-catalog-capabilities-and-si-models.md
+    status: todo
+  - id: T13.02
+    title: "Scoreboard"
+    milestone: M13
+    layer: models
+    depends_on: [T13.01, T12.05]
+    size: M
+    astra_path: false
+    file: tasks/M13-models-routing-and-analytics/T13.02-scoreboard.md
+    status: todo
+  - id: T13.03
+    title: "Router with exploration and diversity"
+    milestone: M13
+    layer: models
+    depends_on: [T13.02, T08.07]
+    size: M
+    astra_path: false
+    file: tasks/M13-models-routing-and-analytics/T13.03-router-with-exploration-and-diversity.md
+    status: todo
+  - id: T13.04
+    title: "Orchestration-only mode for weak code-mode models"
+    milestone: M13
+    layer: models
+    depends_on: [T13.02, T03.02]
+    size: S
+    astra_path: false
+    file: tasks/M13-models-routing-and-analytics/T13.04-orchestration-only-mode-for-weak-code-mode-models.md
+    status: todo
+  - id: T13.05
+    title: "Analytics page"
+    milestone: M13
+    layer: models
+    depends_on: [T04.06, T08.01, T06.08]
+    size: M
+    astra_path: false
+    file: tasks/M13-models-routing-and-analytics/T13.05-analytics-page.md
+    status: todo
+  - id: T13.06
+    title: "OpenTelemetry traces per run"
+    milestone: M13
+    layer: models
+    depends_on: [T00.08, T09.03]
+    size: M
+    astra_path: false
+    file: tasks/M13-models-routing-and-analytics/T13.06-opentelemetry-traces-per-run.md
+    status: todo
+  - id: T13.07
+    title: "Livebook notebook"
+    milestone: M13
+    layer: models
+    depends_on: [T13.05, T13.02]
+    size: S
+    astra_path: false
+    file: tasks/M13-models-routing-and-analytics/T13.07-livebook-notebook.md
+    status: todo
+  - id: T14.01
+    title: "Failure capture and fingerprints"
+    milestone: M14
+    layer: learning
+    depends_on: [T04.10, T05.02]
+    size: M
+    astra_path: false
+    file: tasks/M14-learning-loop/T14.01-failure-capture-and-fingerprints.md
+    status: todo
+  - id: T14.02
+    title: "Lesson extraction"
+    milestone: M14
+    layer: learning
+    depends_on: [T14.01]
+    size: M
+    astra_path: false
+    file: tasks/M14-learning-loop/T14.02-lesson-extraction.md
+    status: todo
+  - id: T14.03
+    title: "Promotion, delivery and retirement of lessons"
+    milestone: M14
+    layer: learning
+    depends_on: [T14.02, T03.02, T00.10]
+    size: M
+    astra_path: false
+    file: tasks/M14-learning-loop/T14.03-promotion-delivery-and-retirement-of-lessons.md
+    status: todo
+  - id: T14.04
+    title: "Versioned prompts and eval gating"
+    milestone: M14
+    layer: learning
+    depends_on: [T07.03]
+    size: M
+    astra_path: false
+    file: tasks/M14-learning-loop/T14.04-versioned-prompts-and-eval-gating.md
+    status: todo
