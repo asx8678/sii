@@ -18,6 +18,7 @@ Visit http://127.0.0.1:4040/. `PORT` can explicitly override the configured port
 ```sh
 mix assets.setup   # locked local npm CLI plus esbuild
 mix assets.build   # CSS and JS
+MIX_ENV=prod mix compile --warnings-as-errors # emits production colocated assets first
 MIX_ENV=prod mix assets.deploy
 mix test
 ```
