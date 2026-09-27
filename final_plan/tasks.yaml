@@ -9,7 +9,7 @@ tasks:
     size: S
     astra_path: true
     file: tasks/M00-foundation/T00.01-repository-and-phoenix-app-skeleton.md
-    status: blocked
+    status: in_progress
   - id: T00.02
     title: "Dependencies, lint, `bin/ci` and task checks"
     milestone: M00
