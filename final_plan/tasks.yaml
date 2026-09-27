@@ -68,7 +68,7 @@ tasks:
     title: "Tracing helper (`Si.Trace`)"
     milestone: M00
     layer: platform
-    depends_on: [T00.02]
+    depends_on: [T00.02, T00.04]
     size: S
     astra_path: false
     file: tasks/M00-foundation/T00.08-tracing-helper-si-trace.md
@@ -86,7 +86,7 @@ tasks:
     title: "Cockpit shell and `/health`"
     milestone: M00
     layer: platform
-    depends_on: [T00.01]
+    depends_on: [T00.01, T00.04]
     size: S
     astra_path: false
     file: tasks/M00-foundation/T00.10-cockpit-shell-and-health.md
@@ -158,7 +158,7 @@ tasks:
     title: "Check pool"
     milestone: M01
     layer: git
-    depends_on: [T01.04, T01.03]
+    depends_on: [T01.04, T01.03, T01.05]
     size: M
     astra_path: true
     file: tasks/M01-git-and-repositories/T01.06-check-pool.md
@@ -176,7 +176,7 @@ tasks:
     title: "Diff analysis (`Si.Diff`)"
     milestone: M02
     layer: checks
-    depends_on: [T01.01]
+    depends_on: [T01.01, T01.05]
     size: M
     astra_path: true
     file: tasks/M02-checks/T02.02-diff-analysis-si-diff.md
@@ -329,7 +329,7 @@ tasks:
     title: "Bridge package scaffold"
     milestone: M04
     layer: bridge
-    depends_on: [T04.01]
+    depends_on: [T04.01, T03.07]
     size: S
     astra_path: true
     file: tasks/M04-si-bridge/T04.03-bridge-package-scaffold.md
@@ -590,7 +590,7 @@ tasks:
     title: "Run ledger v1"
     milestone: M06
     layer: tasks
-    depends_on: [T06.05]
+    depends_on: [T06.05, T06.02]
     size: M
     astra_path: false
     file: tasks/M06-tasks-and-the-single-worker-loop/T06.08-run-ledger-v1.md
@@ -599,7 +599,7 @@ tasks:
     title: "Tasks and session actions in the cockpit"
     milestone: M06
     layer: tasks
-    depends_on: [T06.02, T04.08, T00.12]
+    depends_on: [T06.02, T04.08, T00.12, T03.08]
     size: M
     astra_path: false
     file: tasks/M06-tasks-and-the-single-worker-loop/T06.09-tasks-and-session-actions-in-the-cockpit.md
@@ -698,7 +698,7 @@ tasks:
     title: "Fallback ladders and model switch between turns"
     milestone: M08
     layer: capacity
-    depends_on: [T08.03, T04.08]
+    depends_on: [T08.03, T04.08, T05.01]
     size: M
     astra_path: false
     file: tasks/M08-capacity-cost-budgets-scheduler-memory/T08.07-fallback-ladders-and-model-switch-between-turns.md
@@ -851,7 +851,7 @@ tasks:
     title: "Fovea impact and affected tests"
     milestone: M10
     layer: adapter
-    depends_on: [T10.01, T02.04, T05.03]
+    depends_on: [T10.01, T02.04, T05.03, T10.02]
     size: M
     astra_path: false
     file: tasks/M10-si-adapter-and-fovea/T10.03-fovea-impact-and-affected-tests.md
@@ -1013,7 +1013,7 @@ tasks:
     title: "Lead activations"
     milestone: M12
     layer: supervision
-    depends_on: [T12.03, T09.04, T06.08, T09.05]
+    depends_on: [T12.03, T09.04, T06.08, T09.05, T08.04]
     size: M
     astra_path: false
     file: tasks/M12-signals-judgments-and-the-lead/T12.04-lead-activations.md

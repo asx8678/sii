@@ -17,31 +17,32 @@ In this order (a valid topological order; tasks on the same line may run in para
 | Step | Tasks | What exists afterwards |
 |---|---|---|
 | A1 | T00.01 | Phoenix skeleton in the existing repository |
-| A2 | T00.02 | Dependencies, credo, `bin/ci` |
+| A2 | T00.02 | Dependencies, credo, `bin/ci`, `bin/task-check` |
 | A3 | T00.03, T00.06 | Home paths, IDs |
 | A4 | T00.04, T00.05, T00.09 | Settings, SQLite, `si` CLI transport with the single-instance guard |
 | A5 | T00.07, T00.11 | Event log, test helpers |
 | A6 | T01.01 | Safe git wrapper and locks |
 | A7 | T01.02 | Repo registry, integration branch |
 | A8 | T01.03, T01.04 | Repo profile (`si repo init`), worktrees (with submodules and LFS) |
-| A9 | T01.05, T01.06 | Snapshots (freeze with exclusions), check pool |
-| A10 | T02.01, T02.02 | Check command runner, diff analysis |
-| A11 | T02.03 | Check pipeline, `si check` |
-| A12 | T02.04, T02.05 | Format/build/lint/tests checks, test integrity |
-| A13 | T03.01, T03.04 | Pinned toolchain, Port runner |
-| A14 | T03.02, T03.03, T03.05 | Profiles (tool allowlists with `si_*`), scripted provider `si-faux`, RPC framing |
-| A15 | T03.06 | Session controller (long prompt deadlines, compaction flag) |
-| A16 | T03.07 | Sessions API and CLI (`--session-dir` + `--session-id`) |
-| A17 | T04.01, T04.03 | Bridge protocol schemas, bridge package |
-| A18 | T04.02 | Bridge socket and channel |
-| A19 | T04.04 | Bridge connection and status |
-| A20 | T04.07 | `si_*` tools |
-| A21 | T05.01, T05.02, T05.06 | Model families, verdict storage, inbox |
-| A22 | T05.03 | Astra prompt and review context |
-| A23 | T05.04 | Review run (with an interim cost cap) |
-| A24 | T05.05 | **`si review`** (first usable feature) |
-| A25 | T05.07 | Review rounds and escalation |
-| A26 | T05.10 | Si's own profile, `bin/task-review`: Astra now reviews every task |
+| A9 | T01.05 | Snapshots (freeze with exclusions) |
+| A10 | T01.06 | Check pool (leases slots at a snapshot) |
+| A11 | T02.01, T02.02 | Check command runner, diff analysis |
+| A12 | T02.03 | Check pipeline, `si check` |
+| A13 | T02.04, T02.05 | Format/build/lint/tests checks, test integrity |
+| A14 | T03.01, T03.04 | Pinned toolchain, Port runner |
+| A15 | T03.02, T03.03, T03.05 | Profiles (tool allowlists with `si_*`), scripted provider `si-faux`, RPC framing |
+| A16 | T03.06 | Session controller (long prompt deadlines, compaction flag) |
+| A17 | T03.07 | Sessions API and CLI (`--session-dir` + `--session-id`) |
+| A18 | T04.01 | Bridge protocol schemas |
+| A19 | T04.02, T04.03 | Bridge socket and channel, bridge package |
+| A20 | T04.04 | Bridge connection and status |
+| A21 | T04.07 | `si_*` tools |
+| A22 | T05.01, T05.02, T05.06 | Model families, verdict storage, inbox |
+| A23 | T05.03 | Astra prompt and review context |
+| A24 | T05.04 | Review run (with an interim cost cap) |
+| A25 | T05.05 | **`si review`** (first usable feature) |
+| A26 | T05.07 | Review rounds and escalation |
+| A27 | T05.10 | Si's own profile, `bin/task-review`: Astra now reviews every task |
 
 **Stage A demo:** on a branch with a planted off-by-one bug, `bin/task-review` prints `Verdict: REVISE` with a blocking finding on that line and exits 1; after the fix, round 2 prints `APPROVE` and exits 0.
 
@@ -83,9 +84,9 @@ Once Stage A is done, these lanes are largely independent (respect each task's `
 
 ## 5. Critical path
 
-The longest dependency chain (22 tasks) decides the minimum number of sequential steps:
+The longest dependency chain (23 tasks) decides the minimum number of sequential steps:
 
-T00.01 → T00.02 → T00.03 → T00.05 → T00.11 → T01.01 → T01.02 → T01.04 → T01.06 → T02.01 → T02.03 → T05.03 → T05.04 → T05.05 → T05.11 → T06.04 → T06.05 → T06.06 → T06.07 → T07.02 → T07.03 → T07.04
+T00.01 → T00.02 → T00.03 → T00.05 → T00.11 → T01.01 → T01.02 → T01.04 → T01.05 → T01.06 → T02.01 → T02.03 → T05.03 → T05.04 → T05.05 → T05.11 → T06.04 → T06.05 → T06.06 → T06.07 → T07.02 → T07.03 → T07.04
 
 ## 6. Procedure per task (for the implementation pipeline)
 

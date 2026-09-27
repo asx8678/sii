@@ -12,7 +12,7 @@ These apply to anyone who writes or reviews code here, including the sessions Si
 4. **Tests never call real models.** They use the scripted `si-faux` provider, and every Pi process a test starts has `PI_OFFLINE=1`.
 5. **No secrets** in the repository, in logs or in command output. Token files are created with mode 0600.
 6. **Code rules** (`final_plan/02-repo-layout.md` §2): contexts expose functions; modules have `@moduledoc`, and public functions have `@doc` and `@spec`; structs at boundaries. New code has tests.
-7. **`main` stays green.** Every commit that reaches `main` passes `bin/ci`: format, compile with warnings as errors, credo strict, tests, and TypeScript lint and tests once `bridge/`, `testing/pi-faux/` or `adapter/` exist. Before T00.02 creates `bin/ci`, the task's Verify commands are the gate. The Phoenix guidelines below say to run `mix precommit`; here `bin/ci` is the check that counts.
+7. **`main` stays green.** Every commit that reaches `main` passes `bin/ci`: format, compile with warnings as errors, credo strict, tests (warnings as errors), and TypeScript lint, typecheck and tests once `bridge/`, `testing/pi-faux/` or `adapter/` exist. Before T00.02 creates `bin/ci`, the task's Verify commands are the gate. The Phoenix guidelines below say to run `mix precommit`; here `bin/ci` is the check that counts.
 8. **Keep the docs true.** A new event type, settings key or table goes into `final_plan/03-data-model.md` or `05-schemas-and-config.md` in the same change.
 9. **Reference sources are read-only.** `/Users/adam2/projects/pair/` holds Pi 0.87.1 (`pi/`), Fabric 0.97.0 (`pi-fabric/`), Fovea 0.31.1 (`pi-fovea/`), Pair (`pi-fabric-pair/`) and the owner's audit of Pair (`todo1/`).
 
@@ -74,6 +74,7 @@ After every change, run the loop again from step 1. Record what you saw, not wha
 - The bash tool has no default timeout. Give commands that can hang one: about 900 s for dependency installs, builds and full test runs, and 60 s for single checks.
 - Start servers in the background with their output in a log file under `tmp/` (git ignores it), and print the PID: `mkdir -p tmp; bin/si-server > tmp/si-server.log 2>&1 & echo $!`. Stop exactly that PID when you are done (`kill <pid>`). Never use `pkill`, `killall` or name patterns, because other projects on this machine run their own Phoenix servers and BEAM nodes. Before starting a server, check that its port is free, for example `lsof -nP -iTCP:4040 -sTCP:LISTEN`.
 - The repository's remote is `origin` (`git@github.com:asx8678/si.git`). Pull with `--ff-only`. Push only when the owner asks, and never force-push.
+- Don't pipe `mix` or `elixir` output into `head`: closing the pipe early makes the VM crash and write an `erl_crash.dump`. Redirect to a file under `tmp/` and read that instead.
 - Run nothing interactive: no `iex`, no editors, no `git rebase -i`, no `git add -p`. Pipe `yes` into generators that prompt, pass `-m` to `git commit`, and use `GIT_EDITOR=true git rebase --continue`.
 - Change files only in this folder, in the Si homes (`~/.si`, plus `~/.si-review` for the review node from T05.10 on), in temporary directories that tests create, and, for parallel agents, in their worktrees under `/Users/adam2/projects/skynet-work/`.
 

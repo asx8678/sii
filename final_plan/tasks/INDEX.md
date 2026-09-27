@@ -15,9 +15,9 @@ Dependencies are listed per task; `tasks.yaml` has the same data in machine-read
 | [T00.05](M00-foundation/T00.05-sqlite-configuration-and-test-isolation.md) ★ | SQLite configuration and test isolation | S | T00.03 |
 | [T00.06](M00-foundation/T00.06-ids-si-id.md) ★ | IDs (`Si.Id`) | S | T00.02 |
 | [T00.07](M00-foundation/T00.07-event-log-si-events.md) ★ | Event log (`Si.Events`) | M | T00.05, T00.06 |
-| [T00.08](M00-foundation/T00.08-tracing-helper-si-trace.md) | Tracing helper (`Si.Trace`) | S | T00.02 |
+| [T00.08](M00-foundation/T00.08-tracing-helper-si-trace.md) | Tracing helper (`Si.Trace`) | S | T00.02, T00.04 |
 | [T00.09](M00-foundation/T00.09-cli-transport-si-escript-and-si-cli-server.md) ★ | CLI transport: `si` escript and `Si.CLI.Server` | M | T00.03 |
-| [T00.10](M00-foundation/T00.10-cockpit-shell-and-health.md) | Cockpit shell and `/health` | S | T00.01 |
+| [T00.10](M00-foundation/T00.10-cockpit-shell-and-health.md) | Cockpit shell and `/health` | S | T00.01, T00.04 |
 | [T00.11](M00-foundation/T00.11-test-support-helpers.md) ★ | Test support helpers | S | T00.03, T00.05 |
 | [T00.12](M00-foundation/T00.12-cockpit-access-protection.md) | Cockpit access protection | S | T00.10, T00.09 |
 
@@ -30,14 +30,14 @@ Dependencies are listed per task; `tasks.yaml` has the same data in machine-read
 | [T01.03](M01-git-and-repositories/T01.03-repo-profile-schema-detection-and-si-repo-init.md) ★ | Repo profile: schema, detection and `si repo init` | M | T01.02, T00.04 |
 | [T01.04](M01-git-and-repositories/T01.04-worktree-manager-with-copy-on-write-caches.md) ★ | Worktree manager with copy-on-write caches | M | T01.02 |
 | [T01.05](M01-git-and-repositories/T01.05-freeze-snapshots-of-worktrees-and-refs.md) ★ | Freeze: snapshots of worktrees and refs | M | T01.04 |
-| [T01.06](M01-git-and-repositories/T01.06-check-pool.md) ★ | Check pool | M | T01.04, T01.03 |
+| [T01.06](M01-git-and-repositories/T01.06-check-pool.md) ★ | Check pool | M | T01.04, T01.03, T01.05 |
 
 ## M02 · Checks
 
 | ID | Task | Size | Depends on |
 |---|---|---|---|
 | [T02.01](M02-checks/T02.01-check-command-runner.md) ★ | Check command runner | M | T01.06 |
-| [T02.02](M02-checks/T02.02-diff-analysis-si-diff.md) ★ | Diff analysis (`Si.Diff`) | M | T01.01 |
+| [T02.02](M02-checks/T02.02-diff-analysis-si-diff.md) ★ | Diff analysis (`Si.Diff`) | M | T01.01, T01.05 |
 | [T02.03](M02-checks/T02.03-check-pipeline-results-and-si-check.md) ★ | Check pipeline, results and `si check` | M | T02.01, T02.02, T01.05 |
 | [T02.04](M02-checks/T02.04-format-build-lint-and-tests-checks.md) ★ | Format, build, lint and tests checks | M | T02.03 |
 | [T02.05](M02-checks/T02.05-test-integrity-check.md) ★ | Test-integrity check | M | T02.03 |
@@ -64,7 +64,7 @@ Dependencies are listed per task; `tasks.yaml` has the same data in machine-read
 |---|---|---|---|
 | [T04.01](M04-si-bridge/T04.01-bridge-protocol-schemas-and-validation.md) ★ | Bridge protocol schemas and validation | M | T00.02 |
 | [T04.02](M04-si-bridge/T04.02-bridge-token-socket-and-session-channel.md) ★ | Bridge token, socket and session channel | M | T04.01, T03.07 |
-| [T04.03](M04-si-bridge/T04.03-bridge-package-scaffold.md) ★ | Bridge package scaffold | S | T04.01 |
+| [T04.03](M04-si-bridge/T04.03-bridge-package-scaffold.md) ★ | Bridge package scaffold | S | T04.01, T03.07 |
 | [T04.04](M04-si-bridge/T04.04-bridge-connection-join-and-status.md) ★ | Bridge connection, join and status | M | T04.03, T04.02 |
 | [T04.05](M04-si-bridge/T04.05-event-forwarding-bridge-side.md) | Event forwarding (bridge side) | M | T04.04 |
 | [T04.06](M04-si-bridge/T04.06-event-ingestion-and-analytics-tables.md) | Event ingestion and analytics tables | M | T04.05, T04.02 |
@@ -103,8 +103,8 @@ Dependencies are listed per task; `tasks.yaml` has the same data in machine-read
 | [T06.05](M06-tasks-and-the-single-worker-loop/T06.05-build-check-review-loop.md) | Build–check–review loop | L | T06.04, T05.07, T05.08 |
 | [T06.06](M06-tasks-and-the-single-worker-loop/T06.06-merge-queue-v1.md) | Merge queue v1 | L | T06.05, T02.03 |
 | [T06.07](M06-tasks-and-the-single-worker-loop/T06.07-delivery-to-a-branch-commit-trailers-and-cleanup.md) | Delivery to a branch, commit trailers and cleanup | M | T06.06 |
-| [T06.08](M06-tasks-and-the-single-worker-loop/T06.08-run-ledger-v1.md) | Run ledger v1 | M | T06.05 |
-| [T06.09](M06-tasks-and-the-single-worker-loop/T06.09-tasks-and-session-actions-in-the-cockpit.md) | Tasks and session actions in the cockpit | M | T06.02, T04.08, T00.12 |
+| [T06.08](M06-tasks-and-the-single-worker-loop/T06.08-run-ledger-v1.md) | Run ledger v1 | M | T06.05, T06.02 |
+| [T06.09](M06-tasks-and-the-single-worker-loop/T06.09-tasks-and-session-actions-in-the-cockpit.md) | Tasks and session actions in the cockpit | M | T06.02, T04.08, T00.12, T03.08 |
 
 ## M07 · Eval harness and targets
 
@@ -125,7 +125,7 @@ Dependencies are listed per task; `tasks.yaml` has the same data in machine-read
 | [T08.04](M08-capacity-cost-budgets-scheduler-memory/T08.04-admission-through-the-bridge-pause-and-freeze-all.md) | Admission through the bridge, pause and freeze-all | M | T08.03, T04.09, T08.02 |
 | [T08.05](M08-capacity-cost-budgets-scheduler-memory/T08.05-memory-measurement-and-admission.md) | Memory measurement and admission | M | T03.07 |
 | [T08.06](M08-capacity-cost-budgets-scheduler-memory/T08.06-warm-slots.md) | Warm slots | M | T08.05, T06.04 |
-| [T08.07](M08-capacity-cost-budgets-scheduler-memory/T08.07-fallback-ladders-and-model-switch-between-turns.md) | Fallback ladders and model switch between turns | M | T08.03, T04.08 |
+| [T08.07](M08-capacity-cost-budgets-scheduler-memory/T08.07-fallback-ladders-and-model-switch-between-turns.md) | Fallback ladders and model switch between turns | M | T08.03, T04.08, T05.01 |
 | [T08.08](M08-capacity-cost-budgets-scheduler-memory/T08.08-parallel-workers.md) | Parallel workers | M | T08.04, T08.06 |
 | [T08.09](M08-capacity-cost-budgets-scheduler-memory/T08.09-cache-discipline.md) | Cache discipline | M | T04.09, T08.01 |
 
@@ -152,7 +152,7 @@ Dependencies are listed per task; `tasks.yaml` has the same data in machine-read
 |---|---|---|---|
 | [T10.01](M10-si-adapter-and-fovea/T10.01-adapter-scaffold-framing-and-supervisor.md) | Adapter scaffold, framing and supervisor | M | T03.01 |
 | [T10.02](M10-si-adapter-and-fovea/T10.02-fovea-cache-seeding.md) | Fovea cache seeding | M | T10.01, T01.04 |
-| [T10.03](M10-si-adapter-and-fovea/T10.03-fovea-impact-and-affected-tests.md) | Fovea impact and affected tests | M | T10.01, T02.04, T05.03 |
+| [T10.03](M10-si-adapter-and-fovea/T10.03-fovea-impact-and-affected-tests.md) | Fovea impact and affected tests | M | T10.01, T02.04, T05.03, T10.02 |
 | [T10.04](M10-si-adapter-and-fovea/T10.04-fabric-child-usage.md) | Fabric child usage | S | T10.01, T04.06 |
 | [T10.05](M10-si-adapter-and-fovea/T10.05-fabric-mesh-reading-and-cockpit-panel.md) | Fabric mesh reading and cockpit panel | M | T10.01, T04.12 |
 
@@ -180,7 +180,7 @@ Dependencies are listed per task; `tasks.yaml` has the same data in machine-read
 | [T12.01](M12-signals-judgments-and-the-lead/T12.01-deterministic-signals.md) | Deterministic signals | M | T04.06, T06.05, T08.09 |
 | [T12.02](M12-signals-judgments-and-the-lead/T12.02-jev-client-and-foremans-questions.md) | Jev client and Foreman's questions | M | T12.01 |
 | [T12.03](M12-signals-judgments-and-the-lead/T12.03-intervention-ladder.md) | Intervention ladder | M | T12.01, T04.08, T08.02 |
-| [T12.04](M12-signals-judgments-and-the-lead/T12.04-lead-activations.md) | Lead activations | M | T12.03, T09.04, T06.08, T09.05 |
+| [T12.04](M12-signals-judgments-and-the-lead/T12.04-lead-activations.md) | Lead activations | M | T12.03, T09.04, T06.08, T09.05, T08.04 |
 | [T12.05](M12-signals-judgments-and-the-lead/T12.05-reviewer-canaries.md) | Reviewer canaries | M | T05.07 |
 | [T12.06](M12-signals-judgments-and-the-lead/T12.06-disputes-and-arbitration.md) | Disputes and arbitration | M | T05.07, T06.03 |
 

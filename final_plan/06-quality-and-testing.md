@@ -62,7 +62,7 @@ Each step becomes one scripted assistant message (`fauxAssistantMessage` with `f
 
 ## 5. Astra reviewing this plan's own tasks
 
-Astra runs on a **review node**: a separate Si built from `main` in `$HOME/.si-review/checkout`, with its own home and port 4041 (`bin/review-node setup`; `bin/review-node update` after every merge to `main`). She never runs from the working copy being changed.
+Astra runs on a **review node**: a separate Si built from a detached checkout of `main` in `$HOME/.si-review/checkout`, with its own home and port 4041. It is set up with `bin/review-node setup --astra-model <the owner's choice>`, and refreshed with `bin/review-node update` after every merge to `main`. She never runs from the working copy being changed.
 
 From T05.10 on, `bin/task-review` runs (against the review node):
 
