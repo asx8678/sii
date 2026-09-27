@@ -4,6 +4,8 @@ defmodule Si.TaskCheckProbe do
   @doc "Returns the probe value."
   @spec value() :: :x
   def value do
-    IO.inspect(:x)
+    :x
   end
+
+  def undocumented(value), do: value
 end
