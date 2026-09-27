@@ -18,7 +18,7 @@ tasks:
     size: M
     astra_path: true
     file: tasks/M00-foundation/T00.02-dependencies-lint-bin-ci-and-task-checks.md
-    status: blocked
+    status: in_progress
   - id: T00.03
     title: "`Si.Paths` and `$SI_HOME`"
     milestone: M00
