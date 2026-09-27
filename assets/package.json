@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.0",
+    "tailwindcss": "4.3.0"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.6.0": true
+  }
+}
