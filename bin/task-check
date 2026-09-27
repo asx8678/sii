@@ -29,14 +29,17 @@ emit() {
   printf '%s %s %s\n' "$gate" "$status" "$detail" | tee -a "$report"
   if [[ $status == FAIL ]]; then failed+=("$gate"); fi
 }
-join_lines() { awk 'NF {printf "%s%s", sep, $0; sep="; "} END {print ""}' "$1"; }
+# These grammars use ASCII delimiters; preserve UTF-8 bytes without locale-dependent indexing.
+awk_bytes() { LC_ALL=C awk "$@"; }
+join_lines() { awk_bytes 'NF {printf "%s%s", sep, $0; sep="; "} END {print ""}' "$1"; }
 mentions() {
-  awk -v needle="$1" '
+  awk_bytes -v needle="$1" '
+    BEGIN {delimiters=" \t\r\n`\"()[]{};:,|<>=" sprintf("%c",39)}
     { rest=$0
       while ((at=index(rest,needle))>0) {
         before=at==1 ? "" : substr(rest,at-1,1)
         after=substr(rest,at+length(needle),1)
-        if (before !~ /[A-Za-z0-9_.\/-]/ && after !~ /[A-Za-z0-9_.\/-]/) found=1
+        if ((before=="" || index(delimiters,before)) && (after=="" || index(delimiters,after))) found=1
         rest=substr(rest,at+length(needle))
       }
     } END {exit !found}' "$task"
@@ -110,7 +113,7 @@ elif [[ ${#scope[@]} -gt 0 ]]; then emit scope WARN "${scope[*]}"
 else emit scope PASS 'all changed paths are declared'; fi
 
 if [[ $diff_ok == yes ]] && git -c core.quotePath=false diff --no-ext-diff --no-color -U0 main...HEAD > "$work/diff"; then
-  awk '
+  awk_bytes '
     function skipped(p) {
       return p ~ /^(final_plan\/|docs\/|test\/fixtures\/|evals\/|lib\/si\/checks\/test_integrity\/)/ ||
         p=="AGENTS.md" || p==".credo.exs" || p=="mix.lock" || p ~ /(^|\/)package-lock[.]json$/ ||
@@ -150,7 +153,7 @@ if bin/ci > "$ci_log" 2>&1; then
 else
   code=$?
   ci_ok=no
-  step=$(awk '/^==> / {step=$0} END {print step}' "$ci_log")
+  step=$(awk_bytes '/^==> / {step=$0} END {print step}' "$ci_log")
   tail -n 30 "$ci_log" > "$work/ci-tail"
   emit ci FAIL "exit=$code ${step:-no step reported}; $(join_lines "$work/ci-tail"); log=$ci_log"
 fi
@@ -176,7 +179,7 @@ if [[ $ci_ok == no ]]; then
 elif [[ ! -f $task ]]; then
   emit tests FAIL 'task declaration unavailable'
 else
-  awk '
+  awk_bytes '
     /^[[:space:]]*(```|~~~)/ {fence=!fence; next}
     !fence && /^#+[[:space:]]/ {
       match($0,/^#+/); level=RLENGTH
@@ -239,14 +242,14 @@ if [[ $final == yes ]]; then
   problems=()
   note=final_plan/status/$id.md
   if git show "HEAD:$note" > "$work/note" 2>/dev/null; then
-    if ! awk -v prefix="# $id " 'index($0,prefix)==1 {found=1} END {exit !found}' "$work/note"; then
+    if ! awk_bytes -v prefix="# $id " 'index($0,prefix)==1 {found=1} END {exit !found}' "$work/note"; then
       problems+=("$note: missing task title")
     fi
     for field in 'Branch' 'Summary' 'Files' 'Tests added' 'Acceptance criteria' 'Verify' 'After implementing' 'Deliberate break' 'task-check' 'bin/ci' 'Redo history' 'Deviations' 'Follow-ups'; do
       if ! grep -Eq -- "^[[:space:]]*-[[:space:]]+$field:" "$work/note"; then problems+=("$note: missing $field"); fi
     done
   else problems+=("$note: missing from HEAD"); fi
-  if git show HEAD:final_plan/tasks.yaml > "$work/tasks" 2>/dev/null && awk -v id="$id" '
+  if git show HEAD:final_plan/tasks.yaml > "$work/tasks" 2>/dev/null && awk_bytes -v id="$id" '
     /^[[:space:]]*-[[:space:]]+id:/ {selected=($3==id)}
     selected && /^[[:space:]]*status:/ {if ($2=="done") done=1}
     END {exit !done}' "$work/tasks"; then :

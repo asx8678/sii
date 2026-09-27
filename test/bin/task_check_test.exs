@@ -115,6 +115,19 @@ defmodule Si.TaskCheckTest do
     assert output =~ "docs PASS no changed"
   end
 
+  test "Unicode placeholders in task prose do not break byte-oriented scope scanning", %{dir: dir} do
+    task = Path.join(dir, @task)
+    File.write!(task, File.read!(task) <> File.read!(Path.join(@fixtures, "unicode.md")))
+    write!(dir, "test/unknown_helper.exs", "# fixture data\n")
+    commit!(dir)
+    assert {output, 0} = check(dir)
+    refute output =~ "awk:"
+    assert output == File.read!(Path.join(dir, "tmp/task-check/T99.01.txt"))
+    assert output =~ "tests PASS 0 declared paths"
+    scope = output |> String.split("\n") |> Enum.find(&String.starts_with?(&1, "scope "))
+    assert scope =~ "test/unknown_helper.exs"
+  end
+
   for {line, index} <- Enum.with_index(@cases, 1) do
     [level, path, text] = String.split(line, "|", parts: 3)
     @tag expected_level: level, input_path: path, input_text: text
